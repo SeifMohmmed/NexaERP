@@ -7,15 +7,11 @@ on:
       - master
 
 env:
-  DOTNET_VERSION: "10.x"
+  DOTNET_VERSION: "10.0.x"
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: src/NexaERP
 
     steps:
       - uses: actions/checkout@v4
@@ -26,13 +22,13 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore
-        run: dotnet restore NexaERP.sln
+        run: dotnet restore NexaERP.slnx
 
       - name: Build
-        run: dotnet build NexaERP.sln --configuration Release --no-restore
+        run: dotnet build NexaERP.slnx --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test NexaERP.sln --configuration Release --no-restore --no-build --verbosity normal
+        run: dotnet test NexaERP.slnx --configuration Release --no-build
 
       - name: Publish
-        run: dotnet publish NexaERP.sln --configuration Release --no-restore --no-build
+        run: dotnet publish src/NexaERP.API/NexaERP.API.csproj --configuration Release --no-build
