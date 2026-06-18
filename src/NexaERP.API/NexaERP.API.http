@@ -1,0 +1,6 @@
+@NexaERP.API_HostAddress = http://localhost:5152
+
+GET {{NexaERP.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

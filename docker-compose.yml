@@ -1,0 +1,23 @@
+services:
+  nexaerp.api:
+    image: ${DOCKER_REGISTRY-}nexaerpapi
+    build:
+      context: .
+      dockerfile: src/NexaERP.API/Dockerfile
+    ports:
+      - 5000:8080
+      - 5001:8081
+    environment:
+      # Seq
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://devhabit.seq:5341/ingest/otlp
+      - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+
+  devhabit.seq:
+    image: datalust/seq:2024.3 # or latest
+    environment:
+      ACCEPT_EULA: "Y"
+    volumes:
+      - ./.containers/seq_data:/data
+    ports:
+      - 8080:80
+      - 5341:5341
