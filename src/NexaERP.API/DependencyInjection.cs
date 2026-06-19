@@ -1,4 +1,5 @@
-﻿using OpenTelemetry;
+﻿using Npgsql;
+using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -25,7 +26,11 @@ public static class DependencyInjection
                         resource.AddService(builder.Environment.ApplicationName))
                     .WithTracing(tracing => tracing
                         // Trace outgoing HTTP calls
-                        .AddHttpClientInstrumentation())
+                        .AddHttpClientInstrumentation()
+                        // Trace incoming ASP.NET Core requests
+                        .AddAspNetCoreInstrumentation()
+                        // Trace PostgreSQL queries
+                        .AddNpgsql())
                     .WithMetrics(metrics => metrics
                         // Metrics for outgoing HTTP
                         .AddHttpClientInstrumentation()

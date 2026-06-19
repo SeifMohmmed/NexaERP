@@ -6,6 +6,8 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/NexaERP.API/NexaERP.API.csproj" />
+    <Project Path="src/NexaERP.BLL/NexaERP.BLL.csproj" Id="38dbacc0-79d4-44c5-8ec1-3f8c8aeace30" />
+    <Project Path="src/NexaERP.DAL/NexaERP.DAL.csproj" Id="67d50c17-221c-45e2-a49f-d5954d5390d4" />
   </Folder>
   <Project Path="docker-compose.dcproj">
     <Build />
