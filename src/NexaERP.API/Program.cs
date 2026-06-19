@@ -8,6 +8,7 @@ builder.AddApiServices()
         .AddObservability();
 
 builder.Services.AddDatabase(builder.Configuration);
+builder.Services.AddInfrastructure();
 
 var app = builder.Build();
 
