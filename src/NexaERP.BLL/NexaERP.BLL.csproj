@@ -1,5 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
+    <PackageReference Include="Microsoft.OpenApi" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\NexaERP.DAL\NexaERP.DAL.csproj" />
   </ItemGroup>
 </Project>

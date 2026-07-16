@@ -1,4 +1,5 @@
 using NexaERP.API;
+using NexaERP.API.Extensions;
 using NexaERP.DAL;
 using NexaERP.DAL.Extensions;
 
@@ -7,14 +8,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddApiServices()
         .AddObservability();
 
-builder.Services.AddDatabase(builder.Configuration);
-builder.Services.AddInfrastructure();
+builder.Services
+       .AddSwaggerDocumentation()
+       .AddDatabase(builder.Configuration)
+       .AddInfrastructure();
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+
     await app.Services.ApplyMigrationsAsync();
 
 }

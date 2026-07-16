@@ -8,9 +8,10 @@ services:
       - 5000:8080
       - 5001:8081
     environment:
-      # Seq
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://devhabit.seq:5341/ingest/otlp
-      - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+      # Aspire Dashboard
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://nexaerp.aspire-dashboard:18889
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+
   nexaerp.postgres:
       image: postgres:17.2 # or latest
       environment:
@@ -22,12 +23,9 @@ services:
       ports:
         - 5432:5432
 
-  nexaerp.seq:
-    image: datalust/seq:2024.3 # or latest
+  nexaerp.aspire-dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:9.0
     environment:
-      ACCEPT_EULA: "Y"
-    volumes:
-      - ./.containers/seq_data:/data
+      DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: true
     ports:
-      - 8080:80
-      - 5341:5341
+      - 18888:18888
