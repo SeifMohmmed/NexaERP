@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using NexaERP.BLL.DTOs.Customer;
 using NexaERP.BLL.Mappings;
 using NexaERP.DAL.Repositories.Abstraction;
@@ -27,8 +28,12 @@ public class CustomersController(
     }
 
     [HttpPost]
-    public async Task<ActionResult<CustomerDto>> Create(CreateCustomerDto dto)
+    public async Task<ActionResult<CustomerDto>> Create(
+       [FromBody] CreateCustomerDto dto,
+       [FromServices] IValidator<CreateCustomerDto> validator)
     {
+        await validator.ValidateAndThrowAsync(dto);
+
         var customer = dto.ToEntity();
 
         await customerRepository.AddAsync(customer);
@@ -41,8 +46,13 @@ public class CustomersController(
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult<CustomerDto>> Update(Guid id, UpdateCustomerDto dto)
+    public async Task<ActionResult<CustomerDto>> Update(
+        Guid id,
+        [FromBody] UpdateCustomerDto dto,
+        [FromServices] IValidator<UpdateCustomerDto> validator)
     {
+        await validator.ValidateAndThrowAsync(dto);
+
         var customer = await customerRepository.GetByIdAsync(id);
 
         if (customer is null)
