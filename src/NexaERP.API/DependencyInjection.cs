@@ -1,4 +1,7 @@
-﻿using Npgsql;
+﻿using FluentValidation;
+using NexaERP.API.Middleware;
+using NexaERP.BLL.DTOs.Customer;
+using Npgsql;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -27,6 +30,26 @@ public static class DependencyInjection
         })
         // Support XML responses in addition to JSON.
         .AddXmlSerializerFormatters();
+
+        // Register FluentValidation validators.
+        builder.Services.AddValidatorsFromAssembly(
+            typeof(CreateCustomerDto).Assembly,
+            includeInternalTypes: true);
+
+        // Configure RFC 7807 Problem Details responses.
+        builder.Services.AddProblemDetails(options =>
+        {
+            options.CustomizeProblemDetails = context =>
+            {
+                // Include request ID for troubleshooting.
+                context.ProblemDetails.Extensions.TryAdd(
+                    "requestId",
+                    context.HttpContext.TraceIdentifier);
+            };
+        });
+
+        builder.Services.AddExceptionHandler<ValidationExceptionHandler>();
+        builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
         // Register OpenAPI/Swagger document generation.
         builder.Services.AddOpenApi();
