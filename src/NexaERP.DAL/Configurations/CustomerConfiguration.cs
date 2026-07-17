@@ -8,10 +8,13 @@ internal sealed class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 {
     public void Configure(EntityTypeBuilder<Customer> builder)
     {
+        // Configure table name
         builder.ToTable("Customers");
 
+        // Configure primary key
         builder.HasKey(c => c.Id);
 
+        // Configure required properties and their maximum lengths
         builder.Property(c => c.Name)
             .IsRequired()
             .HasMaxLength(200);
@@ -36,21 +39,23 @@ internal sealed class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .IsRequired()
             .HasMaxLength(100);
 
+        // Tax ID is optional
         builder.Property(c => c.TaxId)
             .HasMaxLength(50);
 
-        builder.Property(c => c.CreatedAtUtc)
-            .IsRequired();
-
-        builder.Property(c => c.UpdatedAtUtc);
-
-        builder.Property(c => c.IsDeleted)
-            .HasDefaultValue(false);
-
+        // Enforce unique email addresses
         builder.HasIndex(c => c.Email)
             .IsUnique();
 
+        // Enforce unique tax IDs
         builder.HasIndex(c => c.TaxId)
             .IsUnique();
+
+        // Configure soft delete flag with a default value
+        builder.Property(c => c.IsDeleted)
+            .HasDefaultValue(false);
+
+        // Exclude soft-deleted customers from queries
+        builder.HasQueryFilter(c => !c.IsDeleted);
     }
 }

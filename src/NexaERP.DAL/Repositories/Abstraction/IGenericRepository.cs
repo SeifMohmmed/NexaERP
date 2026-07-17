@@ -4,7 +4,7 @@ using NexaERP.DAL.Entities;
 namespace NexaERP.DAL.Repositories.Abstraction;
 
 public interface IGenericRepository<T>
-    where T : BaseEntity
+    where T : Entity
 {
     Task<T?> GetByIdAsync(
             Guid id,
@@ -22,7 +22,7 @@ public interface IGenericRepository<T>
         Expression<Func<T, bool>>? predicate = null,
         CancellationToken ct = default);
 
-    void Add(T entity);
+    Task AddAsync(T entity);
 
     void AddRange(IEnumerable<T> entities);
 

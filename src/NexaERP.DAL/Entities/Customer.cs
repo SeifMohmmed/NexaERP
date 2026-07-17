@@ -1,6 +1,6 @@
 ﻿namespace NexaERP.DAL.Entities;
 
-public sealed class Customer : BaseEntity
+public sealed class Customer : Entity
 {
     public string Name { get; set; } = default!;
     public string Email { get; set; } = default!;

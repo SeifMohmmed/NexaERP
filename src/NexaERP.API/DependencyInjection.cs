@@ -11,8 +11,24 @@ public static class DependencyInjection
     public static WebApplicationBuilder AddApiServices(
         this WebApplicationBuilder builder)
     {
-        builder.Services.AddControllers();
+        // Enable dependency injection validation to catch
+        // invalid service registrations during startup.
+        builder.Host.UseDefaultServiceProvider((context, options) =>
+        {
+            options.ValidateScopes = true;
+            options.ValidateOnBuild = true;
+        });
 
+        // Register MVC controllers and configure content negotiation.
+        builder.Services.AddControllers(options =>
+        {
+            // Return HTTP 406 if the requested media type is not supported.
+            options.ReturnHttpNotAcceptable = true;
+        })
+        // Support XML responses in addition to JSON.
+        .AddXmlSerializerFormatters();
+
+        // Register OpenAPI/Swagger document generation.
         builder.Services.AddOpenApi();
 
         return builder;
