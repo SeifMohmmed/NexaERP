@@ -6,8 +6,8 @@ using NexaERP.DAL.Repositories.Abstraction;
 
 namespace NexaERP.DAL.Repositories.Implementation;
 
-internal sealed class GenericRepository<T> : IGenericRepository<T>
-    where T : BaseEntity
+internal class GenericRepository<T> : IGenericRepository<T>
+    where T : Entity
 {
 
     private readonly DbSet<T> _dbSet;
@@ -16,9 +16,9 @@ internal sealed class GenericRepository<T> : IGenericRepository<T>
     {
         _dbSet = context.Set<T>();
     }
-    public void Add(T entity)
+    public async Task AddAsync(T entity)
     {
-        _dbSet.Add(entity);
+        await _dbSet.AddAsync(entity);
     }
 
     public void AddRange(IEnumerable<T> entities)
@@ -40,13 +40,10 @@ internal sealed class GenericRepository<T> : IGenericRepository<T>
     public void Delete(
         T entity)
     {
-        if (typeof(BaseEntity)
-            .IsAssignableFrom(typeof(T)))
+        if (entity is Entity softDeletable)
         {
-            entity.IsDeleted = true;
-
+            softDeletable.IsDeleted = true;
             Update(entity);
-
             return;
         }
 

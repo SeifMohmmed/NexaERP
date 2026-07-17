@@ -14,7 +14,11 @@ public static class DependencyInjection
     this IServiceCollection services)
     {
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        services.AddScoped<IUnitOfWork>(
+            sp => sp.GetRequiredService<ApplicationDbContext>());
+
+        services.AddScoped<ICustomerRepository, CustomerRepository>();
 
         return services;
     }
