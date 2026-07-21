@@ -1,10 +1,12 @@
-﻿using NexaERP.BLL.DTOs.Customer;
+﻿using System.Linq.Expressions;
+using NexaERP.BLL.DTOs.Customer;
 using NexaERP.DAL.Entities;
 
 namespace NexaERP.BLL.Mappings;
 
 public static class CustomerMapping
 {
+    // Maps a Customer entity to a DTO.
     public static CustomerDto ToDto(this Customer customer)
     {
         return new CustomerDto
@@ -20,6 +22,7 @@ public static class CustomerMapping
         };
     }
 
+    // Maps a create DTO to a Customer entity.
     public static Customer ToEntity(this CreateCustomerDto dto)
     {
         return new Customer
@@ -34,16 +37,23 @@ public static class CustomerMapping
         };
     }
 
-    public static CustomersCollectionDto ToCollectionDto(this IEnumerable<Customer> customers)
+    // Projects Customer entities directly to DTOs.
+    public static Expression<Func<Customer, CustomerDto>> ProjectToDto()
     {
-        return new CustomersCollectionDto
+        return customer => new CustomerDto
         {
-            Data = customers
-                .Select(c => c.ToDto())
-                .ToList()
+            Id = customer.Id,
+            Name = customer.Name,
+            Email = customer.Email,
+            Phone = customer.Phone,
+            Address = customer.Address,
+            City = customer.City,
+            Country = customer.Country,
+            TaxId = customer.TaxId
         };
     }
 
+    // Updates an existing Customer entity.
     public static void UpdateEntity(this Customer customer, UpdateCustomerDto dto)
     {
         customer.Name = dto.Name;
