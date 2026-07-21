@@ -1,10 +1,5 @@
 ﻿namespace NexaERP.BLL.DTOs.Customer;
 
-public sealed record CustomersCollectionDto
-{
-    public List<CustomerDto> Data { get; init; } = [];
-}
-
 public sealed record CustomerDto
 {
     public Guid Id { get; init; }

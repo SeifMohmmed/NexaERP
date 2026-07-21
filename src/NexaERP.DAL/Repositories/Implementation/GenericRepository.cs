@@ -9,8 +9,8 @@ namespace NexaERP.DAL.Repositories.Implementation;
 internal class GenericRepository<T> : IGenericRepository<T>
     where T : Entity
 {
+    protected readonly DbSet<T> _dbSet;
 
-    private readonly DbSet<T> _dbSet;
     public GenericRepository(
         ApplicationDbContext context)
     {

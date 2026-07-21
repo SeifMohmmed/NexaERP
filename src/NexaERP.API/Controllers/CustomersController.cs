@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using NexaERP.BLL.DTOs.Common;
 using NexaERP.BLL.DTOs.Customer;
 using NexaERP.BLL.Mappings;
 using NexaERP.DAL.Repositories.Abstraction;
@@ -12,11 +13,19 @@ public class CustomersController(
     IUnitOfWork unitOfWork) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<CustomersCollectionDto>> GetAll()
+    public async Task<ActionResult<PaginationResult<CustomerDto>>> GetCustomers(
+        [FromQuery] CustomerQueryParameters query)
     {
-        var customers = await customerRepository.GetAllAsync();
+        IQueryable<CustomerDto> customersQuery = customerRepository
+            .Search(query.Search)
+            .Select(CustomerMapping.ProjectToDto());
 
-        return Ok(customers.ToCollectionDto());
+        var result = await PaginationResult<CustomerDto>.CreateAsync(
+            customersQuery,
+            query.Page,
+            query.PageSize);
+
+        return Ok(result);
     }
 
     [HttpGet("{id:guid}")]
