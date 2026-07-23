@@ -2,19 +2,17 @@
 
 public abstract class Entity
 {
-    protected Entity(Guid id)  // Creates a new entity with a unique identifier.
+    // Creates an entity with the specified ID.
+    protected Entity(Guid id)
     {
         Id = id;
     }
 
-    //EF Migration usage
+    // Required by EF Core.
     protected Entity()
     {
-
     }
 
-    public Guid Id { get; init; }  // Unique identifier of the entity.
-
-    public bool IsDeleted { get; set; }
-
+    // Entity identifier.
+    public Guid Id { get; init; }
 }
