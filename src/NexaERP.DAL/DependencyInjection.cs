@@ -10,18 +10,26 @@ namespace NexaERP.DAL;
 
 public static class DependencyInjection
 {
+    // Registers repositories and infrastructure services.
     public static IServiceCollection AddInfrastructure(
-    this IServiceCollection services)
+        this IServiceCollection services)
     {
+        // Register generic repository.
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
+        // Register Unit of Work.
         services.AddScoped<IUnitOfWork>(
             sp => sp.GetRequiredService<ApplicationDbContext>());
 
+        // Register repositories.
         services.AddScoped<ICustomerRepository, CustomerRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<IProductRepository, ProductRepository>();
 
         return services;
     }
+
+    // Registers the database context.
     public static IServiceCollection AddDatabase(
         this IServiceCollection services,
         IConfiguration configuration)
