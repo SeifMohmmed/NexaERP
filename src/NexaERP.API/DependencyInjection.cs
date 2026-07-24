@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using NexaERP.API.Middleware;
+using NexaERP.API.Services;
 using NexaERP.BLL.DTOs.Customer;
 using Npgsql;
 using OpenTelemetry;
@@ -53,6 +54,12 @@ public static class DependencyInjection
 
         // Register OpenAPI/Swagger document generation.
         builder.Services.AddOpenApi();
+
+        // Register HttpContext accessor.
+        builder.Services.AddHttpContextAccessor();
+
+        // Register LinkService.
+        builder.Services.AddTransient<LinkService>();
 
         return builder;
     }

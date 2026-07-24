@@ -5,7 +5,7 @@ namespace NexaERP.BLL.DTOs.Common;
 /// <summary>
 /// Represents a paginated response.
 /// </summary>
-public sealed record PaginationResult<T> : ICollectionResponse<T>
+public sealed record PaginationResult<T> : ICollectionResponse<T>, ILinksResponse
 {
     // Current page items.
     public List<T> Items { get; init; }
@@ -28,6 +28,8 @@ public sealed record PaginationResult<T> : ICollectionResponse<T>
     // Indicates whether a next page exists.
     public bool HasNextPage => Page < TotalPages;
 
+    // Collection links.
+    public List<LinkDto> Links { get; set; }
 
     // Creates a paginated result from a query.
     public static async Task<PaginationResult<T>> CreateAsync(

@@ -1,4 +1,6 @@
-﻿namespace NexaERP.BLL.DTOs.Product;
+﻿using NexaERP.BLL.DTOs.Common;
+
+namespace NexaERP.BLL.DTOs.Product;
 
 /// <summary>
 /// Represents product data.
@@ -31,4 +33,7 @@ public sealed class ProductDto
 
     // Minimum stock level.
     public int ReorderLevel { get; init; }
+
+    // Resource links.
+    public List<LinkDto> Links { get; set; }
 }
