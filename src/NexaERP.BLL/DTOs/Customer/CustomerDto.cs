@@ -1,4 +1,6 @@
-﻿namespace NexaERP.BLL.DTOs.Customer;
+﻿using NexaERP.BLL.DTOs.Common;
+
+namespace NexaERP.BLL.DTOs.Customer;
 
 public sealed record CustomerDto
 {
@@ -17,4 +19,7 @@ public sealed record CustomerDto
     public string Country { get; init; }
 
     public string? TaxId { get; init; }
+
+    // Resource links.
+    public List<LinkDto> Links { get; set; }
 }
