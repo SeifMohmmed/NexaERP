@@ -22,26 +22,33 @@ public class CustomersController(
             .Search(query.Search)
             .Select(CustomerMapping.ProjectToDto());
 
+        bool includeLinks = query.Accept == CustomMediaTypeNames.Application.HateoasJson;
+
         var result = await PaginationResult<CustomerDto>.CreateAsync(
             customersQuery,
             query.Page,
             query.PageSize);
 
-        foreach (var customer in result.Items)
+        if (includeLinks)
         {
-            customer.Links = CreateLinksForCustomer(customer.Id);
-        }
+            foreach (var customer in result.Items)
+            {
+                customer.Links = CreateLinksForCustomer(customer.Id);
+            }
 
-        result.Links = CreateLinksForCustomers(
-            query,
-            result.HasNextPage,
-            result.HasPreviousPage);
+            result.Links = CreateLinksForCustomers(
+                query,
+                result.HasNextPage,
+                result.HasPreviousPage);
+        }
 
         return Ok(result);
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<CustomerDto>> GetById(Guid id)
+    public async Task<ActionResult<CustomerDto>> GetById(
+        Guid id,
+        [FromHeader(Name = "Accept")] string? accept)
     {
         var customer = await customerRepository.GetByIdAsync(id);
 
@@ -51,7 +58,11 @@ public class CustomersController(
         }
 
         var dto = customer.ToDto();
-        dto.Links = CreateLinksForCustomer(dto.Id);
+
+        if (accept == CustomMediaTypeNames.Application.HateoasJson)
+        {
+            dto.Links = CreateLinksForCustomer(dto.Id);
+        }
 
         return Ok(dto);
 
