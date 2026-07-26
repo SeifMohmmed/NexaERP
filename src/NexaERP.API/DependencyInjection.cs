@@ -1,4 +1,6 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using NexaERP.API.Middleware;
 using NexaERP.API.Services;
 using NexaERP.BLL.DTOs.Customer;
@@ -31,6 +33,18 @@ public static class DependencyInjection
         })
         // Support XML responses in addition to JSON.
         .AddXmlSerializerFormatters();
+
+        builder.Services.Configure<MvcOptions>(options =>
+        {
+            // Get the JSON output formatter.
+            var formatter = options.OutputFormatters
+                .OfType<SystemTextJsonOutputFormatter>()
+                .First();
+
+            // Register the custom HATEOAS media type.
+            formatter.SupportedMediaTypes.Add(
+                CustomMediaTypeNames.Application.HateoasJson);
+        });
 
         // Register FluentValidation validators.
         builder.Services.AddValidatorsFromAssembly(

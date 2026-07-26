@@ -28,23 +28,30 @@ public class ProductsController(
             query.Page,
             query.PageSize);
 
-        // Add HATEOAS links to each product.
-        foreach (var product in result.Items)
-        {
-            product.Links = CreateLinksForProduct(product.Id);
-        }
+        bool includeLinks = query.Accept == CustomMediaTypeNames.Application.HateoasJson;
 
-        // Add collection links.
-        result.Links = CreateLinksForProducts(
-            query,
-            result.HasNextPage,
-            result.HasPreviousPage);
+        if (includeLinks)
+        {
+            // Add HATEOAS links to each product.
+            foreach (var product in result.Items)
+            {
+                product.Links = CreateLinksForProduct(product.Id);
+            }
+
+            // Add collection links.
+            result.Links = CreateLinksForProducts(
+                query,
+                result.HasNextPage,
+                result.HasPreviousPage);
+        }
 
         return Ok(result);
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<ProductDto>> GetById(Guid id)
+    public async Task<ActionResult<ProductDto>> GetById(
+        Guid id,
+        [FromHeader(Name = "Accept")] string? accept)
     {
         var product = await productRepository.GetByIdAsync(id);
 
@@ -54,7 +61,11 @@ public class ProductsController(
         }
 
         var dto = product.ToDto();
-        dto.Links = CreateLinksForProduct(dto.Id);
+
+        if (accept == CustomMediaTypeNames.Application.HateoasJson)
+        {
+            dto.Links = CreateLinksForProduct(dto.Id);
+        }
 
         return Ok(dto);
     }

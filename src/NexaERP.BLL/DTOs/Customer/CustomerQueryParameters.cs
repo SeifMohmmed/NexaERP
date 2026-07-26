@@ -16,4 +16,8 @@ public sealed record CustomerQueryParameters
 
     // Number of items per page.
     public int PageSize { get; init; } = 10;
+
+    // Requested response media type.
+    [FromHeader(Name = "Accept")]
+    public string? Accept { get; init; }
 }

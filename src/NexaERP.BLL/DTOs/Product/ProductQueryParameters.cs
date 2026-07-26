@@ -1,4 +1,6 @@
-﻿namespace NexaERP.BLL.DTOs.Product;
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace NexaERP.BLL.DTOs.Product;
 
 /// <summary>
 /// Query parameters for product filtering and pagination.
@@ -16,4 +18,8 @@ public sealed class ProductQueryParameters
 
     // Filter low-stock products.
     public bool? LowStock { get; init; }
+
+    // Requested response media type.
+    [FromHeader(Name = "Accept")]
+    public string? Accept { get; init; }
 }
