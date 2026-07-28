@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using NexaERP.DAL.Context;
+using NexaERP.DAL.Database;
 
 namespace NexaERP.DAL.Extensions;
 
