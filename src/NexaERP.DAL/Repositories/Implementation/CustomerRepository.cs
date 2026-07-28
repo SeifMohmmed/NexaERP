@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NexaERP.DAL.Context;
+using NexaERP.DAL.Database;
 using NexaERP.DAL.Entities;
 using NexaERP.DAL.Repositories.Abstraction;
 

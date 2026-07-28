@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NexaERP.DAL.Context;
 using NexaERP.DAL.Entities;
 using NexaERP.DAL.Repositories.Abstraction;
 
-namespace NexaERP.DAL.Context;
+namespace NexaERP.DAL.Database;
 
 public sealed class ApplicationDbContext(
     DbContextOptions<ApplicationDbContext> options) : DbContext(options), IUnitOfWork
@@ -10,6 +11,7 @@ public sealed class ApplicationDbContext(
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<Category> Categories { get; set; }
+    public DbSet<Supplier> Suppliers { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema(Schemas.Application);
