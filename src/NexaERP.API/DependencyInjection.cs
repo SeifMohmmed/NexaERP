@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System.Text.Json.Serialization;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using NexaERP.API.Middleware;
@@ -30,6 +31,12 @@ public static class DependencyInjection
         {
             // Return HTTP 406 if the requested media type is not supported.
             options.ReturnHttpNotAcceptable = true;
+        })
+        // Serialize enums as strings instead of numbers.
+        .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.Converters
+                .Add(new JsonStringEnumConverter());
         })
         // Support XML responses in addition to JSON.
         .AddXmlSerializerFormatters();

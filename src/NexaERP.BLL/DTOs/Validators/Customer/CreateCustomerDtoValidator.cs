@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using NexaERP.BLL.DTOs.Customer;
 
-namespace NexaERP.BLL.DTOs.Validators;
+namespace NexaERP.BLL.DTOs.Validators.Customer;
 
 internal sealed class CreateCustomerDtoValidator : AbstractValidator<CreateCustomerDto>
 {
