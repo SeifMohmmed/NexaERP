@@ -1,12 +1,12 @@
 ﻿using FluentValidation;
 using NexaERP.BLL.DTOs.Product;
 
-namespace NexaERP.BLL.DTOs.Validators;
+namespace NexaERP.BLL.DTOs.Validators.Product;
 
-internal sealed class UpdateProductDtoValidator
-    : AbstractValidator<UpdateProductDto>
+internal sealed class CreateProductDtoValidator
+    : AbstractValidator<CreateProductDto>
 {
-    public UpdateProductDtoValidator()
+    public CreateProductDtoValidator()
     {
         // Validate product name.
         RuleFor(x => x.Name)

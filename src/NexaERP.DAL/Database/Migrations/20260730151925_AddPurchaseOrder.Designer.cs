@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NexaERP.DAL.Database;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NexaERP.DAL.Database.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260730151925_AddPurchaseOrder")]
+    partial class AddPurchaseOrder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -184,42 +187,6 @@ namespace NexaERP.DAL.Database.Migrations
                     b.ToTable("Products", "nexa_erp");
                 });
 
-            modelBuilder.Entity("NexaERP.DAL.Entities.PurchaseLine", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("product_id");
-
-                    b.Property<Guid>("PurchaseOrderId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("purchase_order_id");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("integer")
-                        .HasColumnName("quantity");
-
-                    b.Property<decimal>("UnitCost")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)")
-                        .HasColumnName("unit_cost");
-
-                    b.HasKey("Id")
-                        .HasName("pk_purchase_lines");
-
-                    b.HasIndex("ProductId")
-                        .HasDatabaseName("ix_purchase_lines_product_id");
-
-                    b.HasIndex("PurchaseOrderId")
-                        .HasDatabaseName("ix_purchase_lines_purchase_order_id");
-
-                    b.ToTable("PurchaseLines", "nexa_erp");
-                });
-
             modelBuilder.Entity("NexaERP.DAL.Entities.PurchaseOrder", b =>
                 {
                     b.Property<Guid>("Id")
@@ -318,27 +285,6 @@ namespace NexaERP.DAL.Database.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("NexaERP.DAL.Entities.PurchaseLine", b =>
-                {
-                    b.HasOne("NexaERP.DAL.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_purchase_lines_products_product_id");
-
-                    b.HasOne("NexaERP.DAL.Entities.PurchaseOrder", "PurchaseOrder")
-                        .WithMany("Lines")
-                        .HasForeignKey("PurchaseOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_purchase_lines_purchase_orders_purchase_order_id");
-
-                    b.Navigation("Product");
-
-                    b.Navigation("PurchaseOrder");
-                });
-
             modelBuilder.Entity("NexaERP.DAL.Entities.PurchaseOrder", b =>
                 {
                     b.HasOne("NexaERP.DAL.Entities.Supplier", "Supplier")
@@ -349,11 +295,6 @@ namespace NexaERP.DAL.Database.Migrations
                         .HasConstraintName("fk_purchase_orders_suppliers_supplier_id");
 
                     b.Navigation("Supplier");
-                });
-
-            modelBuilder.Entity("NexaERP.DAL.Entities.PurchaseOrder", b =>
-                {
-                    b.Navigation("Lines");
                 });
 #pragma warning restore 612, 618
         }
