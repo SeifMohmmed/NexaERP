@@ -1,4 +1,4 @@
-﻿using NexaERP.DAL.Entities;
+﻿using NexaERP.DAL.Enums;
 
 namespace NexaERP.BLL.DTOs.PurchaseOrder;
 

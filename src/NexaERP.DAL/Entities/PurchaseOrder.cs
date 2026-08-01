@@ -1,4 +1,6 @@
-﻿namespace NexaERP.DAL.Entities;
+﻿using NexaERP.DAL.Enums;
+
+namespace NexaERP.DAL.Entities;
 
 public class PurchaseOrder : Entity
 {

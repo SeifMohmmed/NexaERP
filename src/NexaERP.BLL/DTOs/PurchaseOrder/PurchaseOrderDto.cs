@@ -1,6 +1,6 @@
 ﻿using NexaERP.BLL.DTOs.Common;
 using NexaERP.BLL.DTOs.PurchaseLine;
-using NexaERP.DAL.Entities;
+using NexaERP.DAL.Enums;
 
 namespace NexaERP.BLL.DTOs.PurchaseOrder;
 

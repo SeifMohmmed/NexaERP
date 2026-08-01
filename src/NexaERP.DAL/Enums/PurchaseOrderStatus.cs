@@ -1,4 +1,4 @@
-﻿namespace NexaERP.DAL.Entities;
+﻿namespace NexaERP.DAL.Enums;
 
 public enum PurchaseOrderStatus
 {

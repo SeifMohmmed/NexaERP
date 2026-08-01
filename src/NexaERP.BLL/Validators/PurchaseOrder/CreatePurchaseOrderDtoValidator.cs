@@ -2,7 +2,7 @@
 using NexaERP.BLL.DTOs.PurchaseLine;
 using NexaERP.BLL.DTOs.PurchaseOrder;
 
-namespace NexaERP.BLL.DTOs.Validators.PurchaseOrder;
+namespace NexaERP.BLL.Validators.PurchaseOrder;
 
 public sealed class CreatePurchaseOrderDtoValidator
     : AbstractValidator<CreatePurchaseOrderDto>

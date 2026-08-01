@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using NexaERP.BLL.DTOs.PurchaseLine;
 
-namespace NexaERP.BLL.DTOs.Validators.PurchaseLine;
+namespace NexaERP.BLL.Validators.PurchaseLine;
 
 public sealed class CreatePurchaseLineDtoValidator
     : AbstractValidator<CreatePurchaseLineDto>
