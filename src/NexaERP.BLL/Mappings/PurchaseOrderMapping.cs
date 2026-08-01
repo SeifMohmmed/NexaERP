@@ -2,6 +2,7 @@
 using NexaERP.BLL.DTOs.PurchaseLine;
 using NexaERP.BLL.DTOs.PurchaseOrder;
 using NexaERP.DAL.Entities;
+using NexaERP.DAL.Enums;
 
 namespace NexaERP.BLL.Mappings;
 

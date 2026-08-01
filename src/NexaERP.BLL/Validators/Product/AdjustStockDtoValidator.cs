@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using NexaERP.BLL.DTOs.Product;
 
-namespace NexaERP.BLL.DTOs.Validators.Product;
+namespace NexaERP.BLL.Validators.Product;
 
 internal sealed class AdjustStockDtoValidator
     : AbstractValidator<AdjustStockDto>

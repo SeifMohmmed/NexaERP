@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
 using NexaERP.BLL.DTOs.Customer;
 
-namespace NexaERP.BLL.DTOs.Validators.Customer;
+namespace NexaERP.BLL.Validators.Customer;
 
-internal sealed class CreateCustomerDtoValidator : AbstractValidator<CreateCustomerDto>
+internal sealed class UpdateCustomerDtoValidator : AbstractValidator<UpdateCustomerDto>
 {
-    public CreateCustomerDtoValidator()
+    public UpdateCustomerDtoValidator()
     {
         RuleFor(x => x.Name)
             .NotEmpty()

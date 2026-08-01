@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using NexaERP.BLL.DTOs.Supplier;
 
-namespace NexaERP.BLL.DTOs.Validators.Supplier;
+namespace NexaERP.BLL.Validators.Supplier;
 
 public sealed class CreateSupplierDtoValidator : AbstractValidator<CreateSupplierDto>
 {
