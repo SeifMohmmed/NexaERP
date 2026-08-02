@@ -81,6 +81,7 @@ public static class DependencyInjection
 
         // Register LinkService.
         builder.Services.AddTransient<LinkService>();
+        builder.Services.AddTransient<InvoicePdfService>();
 
         return builder;
     }

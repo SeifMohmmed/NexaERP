@@ -16,6 +16,8 @@ public sealed class ApplicationDbContext(
     public DbSet<PurchaseLine> PurchaseLines { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderLine> OrderLines { get; set; }
+    public DbSet<Invoice> Invoices { get; set; }
+    public DbSet<InvoiceLine> InvoiceLines { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
