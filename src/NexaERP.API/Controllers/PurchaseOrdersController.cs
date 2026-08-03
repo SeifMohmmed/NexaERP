@@ -30,10 +30,7 @@ public class PurchaseOrdersController(
             query.Page,
             query.PageSize);
 
-        bool includeLinks =
-            query.Accept == CustomMediaTypeNames.Application.HateoasJson;
-
-        if (includeLinks)
+        if (query.IncludeLinks)
         {
             // Add HATEOAS links to each purchase order.
             foreach (var purchaseOrder in result.Items)
@@ -56,7 +53,7 @@ public class PurchaseOrdersController(
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<PurchaseOrderDto>> GetById(
         Guid id,
-        [FromHeader(Name = "Accept")] string? accept)
+        [FromQuery] PurchaseOrderQueryParameters query)
     {
         var purchaseOrder =
             await purchaseOrderRepository.GetWithLinesAsync(id);
@@ -68,7 +65,7 @@ public class PurchaseOrdersController(
 
         var dto = purchaseOrder.ToDto();
 
-        if (accept == CustomMediaTypeNames.Application.HateoasJson)
+        if (query.IncludeLinks)
         {
             dto.Links = CreateLinksForPurchaseOrder(dto.Id);
         }

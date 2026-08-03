@@ -29,10 +29,7 @@ public class SuppliersController(
             query.Page,
             query.PageSize);
 
-        bool includeLinks =
-            query.Accept == CustomMediaTypeNames.Application.HateoasJson;
-
-        if (includeLinks)
+        if (query.IncludeLinks)
         {
             // Add HATEOAS links to each supplier.
             foreach (var supplier in result.Items)
@@ -53,7 +50,7 @@ public class SuppliersController(
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<SupplierDto>> GetById(
         Guid id,
-         [FromHeader(Name = "Accept")] string? accept)
+         [FromQuery] SupplierQueryParameters query)
     {
         var supplier = await supplierRepository.GetByIdAsync(id);
 
@@ -64,7 +61,7 @@ public class SuppliersController(
 
         var supplierDto = supplier.ToDto();
 
-        if (accept == CustomMediaTypeNames.Application.HateoasJson)
+        if (query.IncludeLinks)
         {
             supplierDto.Links = CreateLinksForSupplier(supplierDto.Id);
         }

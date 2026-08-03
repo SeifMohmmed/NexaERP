@@ -35,10 +35,7 @@ public class InvoicesController(
             query.Page,
             query.PageSize);
 
-        bool includeLinks =
-            query.Accept == CustomMediaTypeNames.Application.HateoasJson;
-
-        if (includeLinks)
+        if (query.IncludeLinks)
         {
             foreach (var invoice in result.Items)
             {
@@ -62,7 +59,7 @@ public class InvoicesController(
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<InvoiceDto>> GetById(
     Guid id,
-    [FromHeader(Name = "Accept")] string? accept)
+    [FromQuery] InvoiceQueryParameters query)
     {
         var invoice =
             await invoiceRepository.GetWithLinesAsync(id);
@@ -74,8 +71,7 @@ public class InvoicesController(
 
         var dto = invoice.ToDto();
 
-        if (accept ==
-            CustomMediaTypeNames.Application.HateoasJson)
+        if (query.IncludeLinks)
         {
             dto.Links =
                 CreateLinksForInvoice(

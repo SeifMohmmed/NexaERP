@@ -4,7 +4,7 @@ using NexaERP.DAL.Enums;
 
 namespace NexaERP.BLL.DTOs.Invoice;
 
-public sealed class InvoiceDto
+public sealed class InvoiceDto : ILinksResponse
 {
     public Guid Id { get; init; }
 

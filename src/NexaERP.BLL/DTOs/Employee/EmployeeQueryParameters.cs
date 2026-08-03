@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NexaERP.BLL.DTOs.Common;
 
 namespace NexaERP.BLL.DTOs.Employee;
 
-public sealed class EmployeeQueryParameters
+public sealed class EmployeeQueryParameters : AcceptHeaderDto
 {
     public int Page { get; init; } = 1;
 
@@ -14,7 +15,4 @@ public sealed class EmployeeQueryParameters
     [FromQuery(Name = "q")]
     public string? Search { get; set; }
 
-    // Requested response media type.
-    [FromHeader(Name = "Accept")]
-    public string? Accept { get; init; }
 }

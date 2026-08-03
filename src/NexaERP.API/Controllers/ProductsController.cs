@@ -28,9 +28,7 @@ public class ProductsController(
             query.Page,
             query.PageSize);
 
-        bool includeLinks = query.Accept == CustomMediaTypeNames.Application.HateoasJson;
-
-        if (includeLinks)
+        if (query.IncludeLinks)
         {
             // Add HATEOAS links to each product.
             foreach (var product in result.Items)
@@ -51,7 +49,7 @@ public class ProductsController(
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<ProductDto>> GetById(
         Guid id,
-        [FromHeader(Name = "Accept")] string? accept)
+        [FromQuery] ProductQueryParameters query)
     {
         var product = await productRepository.GetByIdAsync(id);
 
@@ -62,7 +60,7 @@ public class ProductsController(
 
         var dto = product.ToDto();
 
-        if (accept == CustomMediaTypeNames.Application.HateoasJson)
+        if (query.IncludeLinks)
         {
             dto.Links = CreateLinksForProduct(dto.Id);
         }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using NexaERP.API.Middleware;
 using NexaERP.API.Services;
 using NexaERP.BLL.DTOs.Customer;
+using NexaERP.BLL.Services;
 using Npgsql;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;

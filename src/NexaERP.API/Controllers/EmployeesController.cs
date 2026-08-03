@@ -32,10 +32,7 @@ public class EmployeesController(
             query.Page,
             query.PageSize);
 
-        bool includeLinks =
-            query.Accept == CustomMediaTypeNames.Application.HateoasJson;
-
-        if (includeLinks)
+        if (query.IncludeLinks)
         {
             foreach (var employee in result.Items)
             {
@@ -56,7 +53,7 @@ public class EmployeesController(
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<EmployeeDto>> GetById(
     Guid id,
-    [FromHeader(Name = "Accept")] string? accept)
+    [FromQuery] EmployeeQueryParameters query)
     {
         var employee =
             await employeeRepository.GetWithDepartmentAsync(id);
@@ -68,7 +65,7 @@ public class EmployeesController(
 
         var dto = employee.ToDto();
 
-        if (accept == CustomMediaTypeNames.Application.HateoasJson)
+        if (query.IncludeLinks)
         {
             dto.Links = CreateLinksForEmployee(dto.Id);
         }

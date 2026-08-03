@@ -4,7 +4,7 @@ using NexaERP.DAL.Enums;
 
 namespace NexaERP.BLL.DTOs.Order;
 
-public sealed class OrderDto
+public sealed class OrderDto : ILinksResponse
 {
     public Guid Id { get; init; }
 
