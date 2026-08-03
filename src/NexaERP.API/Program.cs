@@ -11,7 +11,8 @@ builder.AddApiServices()
 builder.Services
        .AddSwaggerDocumentation()
        .AddDatabase(builder.Configuration)
-       .AddInfrastructure();
+       .AddInfrastructure()
+       .AddAuthenticationService();
 
 var app = builder.Build();
 
@@ -20,7 +21,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 
-    await app.Services.ApplyMigrationsAsync();
+    await app.ApplyMigrationsAsync();
 
 }
 

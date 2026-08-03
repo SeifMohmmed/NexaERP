@@ -3,4 +3,5 @@
 public static class Schemas
 {
     public const string Application = "nexa_erp";
+    public const string Identity = "identity";
 }

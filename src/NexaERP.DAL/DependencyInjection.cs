@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -50,6 +51,24 @@ public static class DependencyInjection
                         HistoryRepository.DefaultTableName,
                         Schemas.Application))
             .UseSnakeCaseNamingConvention());
+
+        services.AddDbContext<ApplicationIdentityDbContext>(options =>
+            options.UseNpgsql(
+                configuration.GetConnectionString("Database"),
+                npgsqlOptions =>
+                    npgsqlOptions.MigrationsHistoryTable(
+                        HistoryRepository.DefaultTableName,
+                        Schemas.Identity))
+            .UseSnakeCaseNamingConvention());
+
+        return services;
+    }
+
+    public static IServiceCollection AddAuthenticationService(this IServiceCollection services)
+    {
+        services
+            .AddIdentity<IdentityUser, IdentityRole>()
+            .AddEntityFrameworkStores<ApplicationIdentityDbContext>();
 
         return services;
     }

@@ -1,39 +1,50 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NexaERP.DAL.Database;
 
 namespace NexaERP.DAL.Extensions;
 
+/// <summary>
+/// Contains extension methods related to database initialization.
+/// </summary>
 public static class DatabaseExtensions
 {
-    public static async Task ApplyMigrationsAsync(this IServiceProvider services)
+    /// <summary>
+    /// Applies pending Entity Framework Core migrations automatically at application startup.
+    /// Ensures database schema is up to date with current models.
+    /// </summary>
+    public static async Task ApplyMigrationsAsync(this WebApplication app)
     {
-        using IServiceScope scope = services.CreateScope();
+        // Create a scoped service provider
+        // Required because DbContext is registered as scoped service
+        using IServiceScope scope = app.Services.CreateScope();
 
-        ApplicationDbContext dbContext =
+        // Resolve ApplicationDbContext from DI container
+        await using ApplicationDbContext applicationDbContext =
             scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        ILogger logger =
-            scope.ServiceProvider
-                .GetRequiredService<ILoggerFactory>()
-                .CreateLogger("DatabaseMigration");
+        // Resolve ApplicationDbContext from DI container
+        await using ApplicationIdentityDbContext identityDbContext =
+            scope.ServiceProvider.GetRequiredService<ApplicationIdentityDbContext>();
 
         try
         {
-            await dbContext.Database.MigrateAsync();
+            // Apply all pending migrations
+            await applicationDbContext.Database.MigrateAsync();
+            app.Logger.LogInformation("Application database migrations applied successfully.");
 
-            logger.LogInformation(
-                "Application database migrations applied successfully.");
+            await identityDbContext.Database.MigrateAsync();
+            app.Logger.LogInformation("Identity database migrations applied successfully.");
         }
         catch (Exception ex)
         {
-            logger.LogError(
-                ex,
-                "An error occurred while applying database migrations.");
+            // Log migration failure
+            app.Logger.LogError(ex, "An error occurred while applying database migrations.");
 
+            // Re-throw exception so application fails fast
             throw;
         }
     }
-
 }
