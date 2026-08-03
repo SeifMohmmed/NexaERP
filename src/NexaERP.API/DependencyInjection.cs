@@ -82,9 +82,11 @@ public static class DependencyInjection
         // Register HttpContext accessor.
         builder.Services.AddHttpContextAccessor();
 
-        // Register LinkService.
+        // Register Services.
         builder.Services.AddTransient<LinkService>();
         builder.Services.AddTransient<InvoicePdfService>();
+        builder.Services.AddTransient<TokenProvider>();
+
         builder.Services.AddScoped<IAuthService, AuthService>();
 
         return builder;

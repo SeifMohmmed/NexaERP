@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NexaERP.BLL.DTOs.Category;
 using NexaERP.BLL.Mappings;
@@ -6,6 +7,7 @@ using NexaERP.DAL.Repositories.Abstraction;
 
 namespace NexaERP.API.Controllers;
 
+[Authorize]
 [Route("categories")]
 [ApiController]
 public class CategoriesController(

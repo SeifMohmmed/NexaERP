@@ -12,7 +12,7 @@ builder.Services
        .AddSwaggerDocumentation()
        .AddDatabase(builder.Configuration)
        .AddInfrastructure()
-       .AddAuthenticationService();
+       .AddAuthenticationService(builder.Configuration);
 
 var app = builder.Build();
 
@@ -27,9 +27,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
-
 app.UseExceptionHandler();
+
+app.UseAuthentication();
+
+app.UseAuthorization();
 
 app.MapControllers();
 
