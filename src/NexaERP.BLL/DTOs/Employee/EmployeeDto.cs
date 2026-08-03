@@ -2,7 +2,7 @@
 
 namespace NexaERP.BLL.DTOs.Employee;
 
-public sealed class EmployeeDto
+public sealed class EmployeeDto : ILinksResponse
 {
     public Guid Id { get; init; }
 
@@ -28,5 +28,5 @@ public sealed class EmployeeDto
 
     public string? ProfilePhotoUrl { get; init; }
 
-    public List<LinkDto>? Links { get; set; }
+    public List<LinkDto> Links { get; set; }
 }

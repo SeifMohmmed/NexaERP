@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NexaERP.BLL.DTOs.Common;
 
 namespace NexaERP.BLL.DTOs.Customer;
 
 /// <summary>
 /// Query parameters for customer filtering and pagination.
 /// </summary>
-public sealed record CustomerQueryParameters
+public sealed class CustomerQueryParameters : AcceptHeaderDto
 {
     // Search term.
     [FromQuery(Name = "q")]
@@ -16,8 +17,4 @@ public sealed record CustomerQueryParameters
 
     // Number of items per page.
     public int PageSize { get; init; } = 10;
-
-    // Requested response media type.
-    [FromHeader(Name = "Accept")]
-    public string? Accept { get; init; }
 }

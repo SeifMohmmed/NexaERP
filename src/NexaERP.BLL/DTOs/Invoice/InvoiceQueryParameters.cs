@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using NexaERP.BLL.DTOs.Common;
 using NexaERP.DAL.Enums;
 
 namespace NexaERP.BLL.DTOs.Invoice;
 
-public sealed class InvoiceQueryParameters
+public sealed class InvoiceQueryParameters : AcceptHeaderDto
 {
     public int Page { get; init; } = 1;
 
@@ -16,8 +16,4 @@ public sealed class InvoiceQueryParameters
     public DateTime? From { get; init; }
 
     public DateTime? To { get; init; }
-
-    // Requested response media type.
-    [FromHeader(Name = "Accept")]
-    public string? Accept { get; init; }
 }

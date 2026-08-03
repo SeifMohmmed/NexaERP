@@ -2,7 +2,7 @@
 
 namespace NexaERP.BLL.DTOs.Customer;
 
-public sealed record CustomerDto
+public sealed record CustomerDto : ILinksResponse
 {
     public Guid Id { get; init; }
 

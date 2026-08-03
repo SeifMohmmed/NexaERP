@@ -2,7 +2,7 @@
 
 namespace NexaERP.BLL.DTOs.Supplier;
 
-public sealed class SupplierDto
+public sealed class SupplierDto : ILinksResponse
 {
     public Guid Id { get; init; }
 

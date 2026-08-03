@@ -1,4 +1,4 @@
-﻿namespace NexaERP.API.Services;
+﻿namespace NexaERP.BLL.Services;
 
 public static class CustomMediaTypeNames
 {
@@ -6,5 +6,6 @@ public static class CustomMediaTypeNames
     {
         // Custom media type for HATEOAS responses.
         public const string HateoasJson = "application/vnd.nexa-erp.hateoas+json";
+        public const string HateoasSubType = "hateoas";
     }
 }

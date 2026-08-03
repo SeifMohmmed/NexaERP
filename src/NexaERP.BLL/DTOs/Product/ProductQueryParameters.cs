@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using NexaERP.BLL.DTOs.Common;
 
 namespace NexaERP.BLL.DTOs.Product;
 
 /// <summary>
 /// Query parameters for product filtering and pagination.
 /// </summary>
-public sealed class ProductQueryParameters
+public sealed class ProductQueryParameters : AcceptHeaderDto
 {
     // Requested page number.
     public int Page { get; init; } = 1;
@@ -18,8 +18,4 @@ public sealed class ProductQueryParameters
 
     // Filter low-stock products.
     public bool? LowStock { get; init; }
-
-    // Requested response media type.
-    [FromHeader(Name = "Accept")]
-    public string? Accept { get; init; }
 }

@@ -5,7 +5,7 @@ namespace NexaERP.BLL.DTOs.Product;
 /// <summary>
 /// Represents product data.
 /// </summary>
-public sealed class ProductDto
+public sealed class ProductDto : ILinksResponse
 {
     // Product identifier.
     public Guid Id { get; init; }

@@ -22,14 +22,12 @@ public class CustomersController(
             .Search(query.Search)
             .Select(CustomerMapping.ProjectToDto());
 
-        bool includeLinks = query.Accept == CustomMediaTypeNames.Application.HateoasJson;
-
         var result = await PaginationResult<CustomerDto>.CreateAsync(
             customersQuery,
             query.Page,
             query.PageSize);
 
-        if (includeLinks)
+        if (query.IncludeLinks)
         {
             foreach (var customer in result.Items)
             {
@@ -48,7 +46,7 @@ public class CustomersController(
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<CustomerDto>> GetById(
         Guid id,
-        [FromHeader(Name = "Accept")] string? accept)
+        [FromQuery] CustomerQueryParameters query)
     {
         var customer = await customerRepository.GetByIdAsync(id);
 
@@ -59,7 +57,7 @@ public class CustomersController(
 
         var dto = customer.ToDto();
 
-        if (accept == CustomMediaTypeNames.Application.HateoasJson)
+        if (query.IncludeLinks)
         {
             dto.Links = CreateLinksForCustomer(dto.Id);
         }

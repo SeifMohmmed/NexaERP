@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using NexaERP.BLL.DTOs.Common;
 using NexaERP.DAL.Enums;
 
 namespace NexaERP.BLL.DTOs.Order;
 
-public sealed class OrderQueryParameters
+public sealed class OrderQueryParameters : AcceptHeaderDto
 {
     public int Page { get; init; } = 1;
 
@@ -16,8 +16,4 @@ public sealed class OrderQueryParameters
     public DateOnly? From { get; init; }
 
     public DateOnly? To { get; init; }
-
-    // Requested response media type.
-    [FromHeader(Name = "Accept")]
-    public string? Accept { get; init; }
 }

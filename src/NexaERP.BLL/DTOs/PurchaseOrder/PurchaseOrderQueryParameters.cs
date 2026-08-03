@@ -1,14 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using NexaERP.BLL.DTOs.Common;
 
 namespace NexaERP.BLL.DTOs.PurchaseOrder;
 
-public sealed class PurchaseOrderQueryParameters
+public sealed class PurchaseOrderQueryParameters : AcceptHeaderDto
 {
     public int Page { get; init; } = 1;
 
     public int PageSize { get; init; } = 10;
-
-    // Requested response media type.
-    [FromHeader(Name = "Accept")]
-    public string? Accept { get; init; }
 }
