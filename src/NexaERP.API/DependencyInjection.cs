@@ -6,6 +6,8 @@ using NexaERP.API.Middleware;
 using NexaERP.API.Services;
 using NexaERP.BLL.DTOs.Customer;
 using NexaERP.BLL.Services;
+using NexaERP.BLL.Services.Abstraction;
+using NexaERP.BLL.Services.Implementation;
 using Npgsql;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
@@ -83,6 +85,7 @@ public static class DependencyInjection
         // Register LinkService.
         builder.Services.AddTransient<LinkService>();
         builder.Services.AddTransient<InvoicePdfService>();
+        builder.Services.AddScoped<IAuthService, AuthService>();
 
         return builder;
     }
