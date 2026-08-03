@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using NexaERP.BLL.DTOs.Auth;
 using NexaERP.BLL.DTOs.Users;
 using NexaERP.BLL.Mappings;
 using NexaERP.BLL.Services.Abstraction;
@@ -13,6 +14,7 @@ public sealed class AuthService(
     IUserRepository userRepository,
     IUnitOfWork unitOfWork,
     UserManager<IdentityUser> userManager,
+    TokenProvider tokenProvider,
     ApplicationDbContext appDbContext,
     ApplicationIdentityDbContext identityDbContext)
     : IAuthService
@@ -71,11 +73,50 @@ public sealed class AuthService(
         // Commit the transaction.
         await transaction.CommitAsync();
 
+        var tokenRequest = new TokenRequest(identityUser.Id, identityUser.Email);
+        AccessTokenDto accessToken = tokenProvider.Create(tokenRequest);
+
         // Return the registration result.
         return new RegisterResult
         {
             Succeeded = true,
-            UserId = user.Id
+            Token = accessToken
+        };
+    }
+
+    // Authenticates a user and returns a JWT token.
+    public async Task<LoginResult> LoginAsync(LoginUserDto dto)
+    {
+        // Find the user by email.
+        IdentityUser? identityUser =
+            await userManager.FindByEmailAsync(dto.Email);
+
+        // Validate the user credentials.
+        if (identityUser is null ||
+            !await userManager.CheckPasswordAsync(identityUser, dto.Password))
+        {
+            return new LoginResult
+            {
+                Succeeded = false,
+
+                // Return an authentication error.
+                Errors = new Dictionary<string, string>
+                {
+                    ["InvalidCredentials"] = "Invalid email or password."
+                }
+            };
+        }
+
+        // Create the token payload.
+        var tokenRequest = new TokenRequest(
+            identityUser.Id,
+            identityUser.Email!);
+
+        // Return the generated access token.
+        return new LoginResult
+        {
+            Succeeded = true,
+            Token = tokenProvider.Create(tokenRequest)
         };
     }
 }

@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NexaERP.API.Services;
 using NexaERP.BLL.DTOs.Common;
@@ -7,6 +8,7 @@ using NexaERP.BLL.Mappings;
 using NexaERP.DAL.Repositories.Abstraction;
 namespace NexaERP.API.Controllers;
 
+[Authorize]
 [Route("customers")]
 [ApiController]
 public class CustomersController(

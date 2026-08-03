@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NexaERP.BLL.DTOs.Department;
@@ -7,6 +8,7 @@ using NexaERP.DAL.Repositories.Abstraction;
 
 namespace NexaERP.API.Controllers;
 
+[Authorize]
 [Route("departments")]
 [ApiController]
 public class DepartmentsController(
