@@ -7,7 +7,7 @@ namespace NexaERP.API.Controllers;
 
 [Route("users")]
 [ApiController]
-internal sealed class UsersController(
+public sealed class UsersController(
     IUserRepository userRepository) : ControllerBase
 {
     [HttpGet("{id}")]
