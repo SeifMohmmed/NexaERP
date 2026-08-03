@@ -18,6 +18,8 @@ public sealed class ApplicationDbContext(
     public DbSet<OrderLine> OrderLines { get; set; }
     public DbSet<Invoice> Invoices { get; set; }
     public DbSet<InvoiceLine> InvoiceLines { get; set; }
+    public DbSet<Employee> Employees { get; set; }
+    public DbSet<Department> Departments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
