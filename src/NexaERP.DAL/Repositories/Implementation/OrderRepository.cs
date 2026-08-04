@@ -12,6 +12,7 @@ internal sealed class OrderRepository(
       IOrderRepository
 {
     public IQueryable<Order> Filter(
+        Guid userId,
         OrderStatus? status,
         Guid? customerId,
         DateOnly? from,
@@ -19,6 +20,7 @@ internal sealed class OrderRepository(
     {
         var query = context.Orders
             .AsNoTracking()
+            .Where(o => o.UserId == userId)
             .AsQueryable();
 
         if (status.HasValue)
@@ -52,10 +54,16 @@ internal sealed class OrderRepository(
         return query;
     }
 
-    public async Task<Order?> GetWithLinesAsync(Guid id)
+    public async Task<Order?> GetByIdAsync(Guid id, Guid userId)
+    {
+        return await context.Orders
+            .FirstOrDefaultAsync(o => o.Id == id && o.UserId == userId);
+    }
+
+    public async Task<Order?> GetWithLinesAsync(Guid id, Guid userId)
     {
         return await context.Orders
             .Include(o => o.Lines)
-            .FirstOrDefaultAsync(o => o.Id == id);
+            .FirstOrDefaultAsync(o => o.Id == id && o.UserId == userId);
     }
 }

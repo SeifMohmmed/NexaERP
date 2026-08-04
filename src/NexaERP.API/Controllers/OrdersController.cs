@@ -7,6 +7,7 @@ using NexaERP.BLL.DTOs.Order;
 using NexaERP.BLL.Mappings;
 using NexaERP.DAL.Enums;
 using NexaERP.DAL.Repositories.Abstraction;
+using NexaERP.DAL.Services;
 
 namespace NexaERP.API.Controllers;
 
@@ -16,15 +17,24 @@ namespace NexaERP.API.Controllers;
 public class OrdersController(
     IOrderRepository orderRepository,
     IUnitOfWork unitOfWork,
-    LinkService linkService)
+    LinkService linkService,
+    UserContext userContext)
     : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<PaginationResult<OrderDto>>> GetOrders(
         [FromQuery] OrderQueryParameters query)
     {
+        Guid? userId = await userContext.GetUserIdAsync();
+
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
         var orders = orderRepository
             .Filter(
+                userId.Value,
                 query.Status,
                 query.CustomerId,
                 query.From,
@@ -59,7 +69,16 @@ public class OrdersController(
         Guid id,
         [FromQuery] OrderQueryParameters query)
     {
-        var order = await orderRepository.GetWithLinesAsync(id);
+        Guid? userId = await userContext.GetUserIdAsync();
+
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        var order = await orderRepository.GetWithLinesAsync(
+            id,
+            userId.Value);
 
         if (order is null)
         {
@@ -81,9 +100,16 @@ public class OrdersController(
         [FromBody] CreateOrderDto dto,
         [FromServices] IValidator<CreateOrderDto> validator)
     {
+        Guid? userId = await userContext.GetUserIdAsync();
+
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
         await validator.ValidateAndThrowAsync(dto);
 
-        var order = dto.ToEntity();
+        var order = dto.ToEntity(userId.Value);
 
         await orderRepository.AddAsync(order);
         await unitOfWork.SaveChangesAsync();
@@ -106,9 +132,18 @@ public class OrdersController(
         [FromBody] UpdateOrderDto dto,
         [FromServices] IValidator<UpdateOrderDto> validator)
     {
+        Guid? userId = await userContext.GetUserIdAsync();
+
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
         await validator.ValidateAndThrowAsync(dto);
 
-        var order = await orderRepository.GetByIdAsync(id);
+        var order = await orderRepository.GetByIdAsync(
+            id,
+            userId.Value);
 
         if (order is null)
         {
@@ -130,9 +165,18 @@ public class OrdersController(
         [FromBody] UpdateOrderStatusDto dto,
         [FromServices] IValidator<UpdateOrderStatusDto> validator)
     {
+        Guid? userId = await userContext.GetUserIdAsync();
+
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
         await validator.ValidateAndThrowAsync(dto);
 
-        var order = await orderRepository.GetByIdAsync(id);
+        var order = await orderRepository.GetByIdAsync(
+            id,
+            userId.Value);
 
         if (order is null)
         {
@@ -157,7 +201,16 @@ public class OrdersController(
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var order = await orderRepository.GetByIdAsync(id);
+        Guid? userId = await userContext.GetUserIdAsync();
+
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        var order = await orderRepository.GetByIdAsync(
+            id,
+            userId.Value);
 
         if (order is null)
         {

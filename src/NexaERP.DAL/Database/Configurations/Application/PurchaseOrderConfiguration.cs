@@ -38,6 +38,14 @@ internal sealed class PurchaseOrderConfiguration
             .IsRequired()
             .HasPrecision(18, 2);
 
+        builder.Property(h => h.UserId).HasMaxLength(500);
+
+        builder.HasOne<User>()
+            .WithMany()
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+
         // Configure Supplier -> PurchaseOrders relationship
         builder.HasOne(po => po.Supplier)
             .WithMany()

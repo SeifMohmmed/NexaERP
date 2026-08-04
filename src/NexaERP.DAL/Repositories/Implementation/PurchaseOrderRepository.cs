@@ -10,16 +10,31 @@ internal sealed class PurchaseOrderRepository(
     : GenericRepository<PurchaseOrder>(context),
       IPurchaseOrderRepository
 {
-    public async Task<PurchaseOrder?> GetWithLinesAsync(Guid id)
-    {
-        return await context.PurchaseOrders
-            .Include(po => po.Lines)
-            .FirstOrDefaultAsync(po => po.Id == id);
-    }
-
-    public IQueryable<PurchaseOrder> Query()
+    public IQueryable<PurchaseOrder> Query(Guid userId)
     {
         return context.PurchaseOrders
-            .AsNoTracking();
+            .AsNoTracking()
+            .Where(p => p.UserId == userId);
+    }
+
+    public async Task<PurchaseOrder?> GetByIdAsync(
+        Guid id,
+        Guid userId)
+    {
+        return await context.PurchaseOrders
+            .FirstOrDefaultAsync(p =>
+                p.Id == id &&
+                p.UserId == userId);
+    }
+
+    public async Task<PurchaseOrder?> GetWithLinesAsync(
+        Guid id,
+        Guid userId)
+    {
+        return await context.PurchaseOrders
+            .Include(p => p.Lines)
+            .FirstOrDefaultAsync(p =>
+                p.Id == id &&
+                p.UserId == userId);
     }
 }
