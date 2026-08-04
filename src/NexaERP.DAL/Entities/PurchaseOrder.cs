@@ -6,6 +6,8 @@ public class PurchaseOrder : Entity
 {
     public Guid SupplierId { get; set; }
 
+    public Guid UserId { get; set; }
+
     public DateTime OrderDate { get; set; }
 
     public DateTime ExpectedDelivery { get; set; }

@@ -6,6 +6,8 @@ public class Order : Entity
 {
     public Guid CustomerId { get; set; }
 
+    public Guid UserId { get; set; }
+
     public DateTime OrderDate { get; set; }
 
     public OrderStatus Status { get; set; }

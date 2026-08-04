@@ -6,6 +6,7 @@ using NexaERP.BLL.DTOs.Common;
 using NexaERP.BLL.DTOs.PurchaseOrder;
 using NexaERP.BLL.Mappings;
 using NexaERP.DAL.Repositories.Abstraction;
+using NexaERP.DAL.Services;
 
 namespace NexaERP.API.Controllers;
 
@@ -15,7 +16,8 @@ namespace NexaERP.API.Controllers;
 public class PurchaseOrdersController(
     IPurchaseOrderRepository purchaseOrderRepository,
     IUnitOfWork unitOfWork,
-    LinkService linkService)
+    LinkService linkService,
+    UserContext userContext)
     : ControllerBase
 {
 
@@ -23,8 +25,15 @@ public class PurchaseOrdersController(
     public async Task<ActionResult<PaginationResult<PurchaseOrderDto>>> GetPurchaseOrders(
     [FromQuery] PurchaseOrderQueryParameters query)
     {
+        Guid? userId = await userContext.GetUserIdAsync();
+
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
         var purchaseOrders = purchaseOrderRepository
-            .Query()
+            .Query(userId.Value)
             .Select(PurchaseOrderMapping.ProjectToDto());
 
         var result = await PaginationResult<PurchaseOrderDto>.CreateAsync(
@@ -57,8 +66,17 @@ public class PurchaseOrdersController(
         Guid id,
         [FromQuery] PurchaseOrderQueryParameters query)
     {
+        Guid? userId = await userContext.GetUserIdAsync();
+
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
         var purchaseOrder =
-            await purchaseOrderRepository.GetWithLinesAsync(id);
+            await purchaseOrderRepository.GetWithLinesAsync(
+                id,
+                userId.Value);
 
         if (purchaseOrder is null)
         {
@@ -80,9 +98,16 @@ public class PurchaseOrdersController(
     [FromBody] CreatePurchaseOrderDto dto,
     [FromServices] IValidator<CreatePurchaseOrderDto> validator)
     {
+        Guid? userId = await userContext.GetUserIdAsync();
+
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
         await validator.ValidateAndThrowAsync(dto);
 
-        var purchaseOrder = dto.ToEntity();
+        var purchaseOrder = dto.ToEntity(userId.Value);
 
         await purchaseOrderRepository.AddAsync(purchaseOrder);
 
@@ -106,10 +131,19 @@ public class PurchaseOrdersController(
     [FromBody] UpdatePurchaseOrderDto dto,
     [FromServices] IValidator<UpdatePurchaseOrderDto> validator)
     {
+        Guid? userId = await userContext.GetUserIdAsync();
+
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
         await validator.ValidateAndThrowAsync(dto);
 
         var purchaseOrder =
-            await purchaseOrderRepository.GetByIdAsync(id);
+            await purchaseOrderRepository.GetByIdAsync(
+                id,
+                userId.Value);
 
         if (purchaseOrder is null)
         {
@@ -132,10 +166,19 @@ public class PurchaseOrdersController(
     [FromBody] UpdatePurchaseOrderStatusDto dto,
     [FromServices] IValidator<UpdatePurchaseOrderStatusDto> validator)
     {
+        Guid? userId = await userContext.GetUserIdAsync();
+
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
         await validator.ValidateAndThrowAsync(dto);
 
         var purchaseOrder =
-            await purchaseOrderRepository.GetByIdAsync(id);
+            await purchaseOrderRepository.GetByIdAsync(
+                id,
+                userId.Value);
 
         if (purchaseOrder is null)
         {

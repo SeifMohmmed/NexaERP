@@ -44,6 +44,14 @@ internal sealed class OrderConfiguration
             .IsRequired()
             .HasPrecision(18, 2);
 
+        builder.Property(h => h.UserId)
+            .HasMaxLength(500);
+
+        builder.HasOne<User>()
+            .WithMany()
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         // Configure Customer -> Orders relationship
         builder.HasOne(o => o.Customer)
             .WithMany()

@@ -7,4 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\NexaERP.DAL\NexaERP.DAL.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Extensions\" />
+  </ItemGroup>
 </Project>

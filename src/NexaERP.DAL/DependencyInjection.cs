@@ -10,6 +10,7 @@ using NexaERP.DAL.Context;
 using NexaERP.DAL.Database;
 using NexaERP.DAL.Repositories.Abstraction;
 using NexaERP.DAL.Repositories.Implementation;
+using NexaERP.DAL.Services;
 using NexaERP.DAL.Settings;
 
 namespace NexaERP.DAL;
@@ -40,6 +41,8 @@ public static class DependencyInjection
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
+        services.AddMemoryCache();
+        services.AddScoped<UserContext>();
         return services;
     }
 

@@ -8,11 +8,12 @@ namespace NexaERP.BLL.Mappings;
 
 public static class PurchaseOrderMapping
 {
-    public static PurchaseOrder ToEntity(this CreatePurchaseOrderDto dto)
+    public static PurchaseOrder ToEntity(this CreatePurchaseOrderDto dto, Guid userId)
     {
         var purchaseOrder = new PurchaseOrder
         {
             SupplierId = dto.SupplierId,
+            UserId = userId,
             OrderDate = DateTime.UtcNow,
             ExpectedDelivery = dto.ExpectedDelivery,
             Status = PurchaseOrderStatus.Pending,
