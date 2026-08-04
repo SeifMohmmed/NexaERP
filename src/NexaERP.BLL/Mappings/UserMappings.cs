@@ -1,4 +1,4 @@
-﻿using NexaERP.BLL.DTOs.Users;
+﻿using NexaERP.BLL.DTOs.Auth;
 using NexaERP.DAL.Entities;
 
 namespace NexaERP.BLL.Mappings;

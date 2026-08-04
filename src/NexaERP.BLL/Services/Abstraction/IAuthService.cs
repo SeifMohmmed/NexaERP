@@ -1,12 +1,12 @@
 ﻿using NexaERP.BLL.DTOs.Auth;
-using NexaERP.BLL.DTOs.Users;
 
 namespace NexaERP.BLL.Services.Abstraction;
 
 public interface IAuthService
 {
-    Task<RegisterResult> RegisterAsync(RegisterUserDto dto);
+    Task<AuthenticationResult> RegisterAsync(RegisterUserDto dto);
 
-    Task<LoginResult> LoginAsync(LoginUserDto dto);
+    Task<AuthenticationResult> LoginAsync(LoginUserDto dto);
 
+    Task<AuthenticationResult> RefreshAsync(RefreshTokenDto dto);
 }

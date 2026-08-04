@@ -1,6 +1,6 @@
 ﻿namespace NexaERP.BLL.DTOs.Auth;
 
-public sealed record LoginResult
+public class AuthenticationResult
 {
     public bool Succeeded { get; init; }
 

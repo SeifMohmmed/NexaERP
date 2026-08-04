@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NexaERP.DAL.Context;
+using NexaERP.DAL.Database.Configurations.Application;
 using NexaERP.DAL.Entities;
 using NexaERP.DAL.Repositories.Abstraction;
 
@@ -26,6 +27,18 @@ public sealed class ApplicationDbContext(
     {
         modelBuilder.HasDefaultSchema(Schemas.Application);
 
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+        modelBuilder.ApplyConfiguration(new CustomerConfiguration());
+        modelBuilder.ApplyConfiguration(new ProductConfiguration());
+        modelBuilder.ApplyConfiguration(new CategoryConfiguration());
+        modelBuilder.ApplyConfiguration(new SupplierConfiguration());
+        modelBuilder.ApplyConfiguration(new PurchaseOrderConfiguration());
+        modelBuilder.ApplyConfiguration(new PurchaseLineConfiguration());
+        modelBuilder.ApplyConfiguration(new OrderConfiguration());
+        modelBuilder.ApplyConfiguration(new OrderLineConfiguration());
+        modelBuilder.ApplyConfiguration(new InvoiceConfiguration());
+        modelBuilder.ApplyConfiguration(new InvoiceLineConfiguration());
+        modelBuilder.ApplyConfiguration(new EmployeeConfiguration());
+        modelBuilder.ApplyConfiguration(new DepartmentConfiguration());
+        modelBuilder.ApplyConfiguration(new UserConfiguration());
     }
 }

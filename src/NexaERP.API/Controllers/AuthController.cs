@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NexaERP.BLL.DTOs.Auth;
-using NexaERP.BLL.DTOs.Users;
 using NexaERP.BLL.Services.Abstraction;
 
 namespace NexaERP.API.Controllers;
@@ -44,12 +43,36 @@ public sealed class AuthController(
     {
         await validator.ValidateAndThrowAsync(dto);
 
-        LoginResult result = await authService.LoginAsync(dto);
+        AuthenticationResult result = await authService.LoginAsync(dto);
 
         if (!result.Succeeded)
         {
             return Problem(
                 detail: "Invalid email or password.",
+                statusCode: StatusCodes.Status401Unauthorized,
+                extensions: new Dictionary<string, object?>
+                {
+                    ["errors"] = result.Errors
+                });
+        }
+
+        return Ok(result.Token);
+    }
+
+    [HttpPost("refresh")]
+    public async Task<ActionResult<AccessTokenDto>> Refresh(
+    [FromBody] RefreshTokenDto dto,
+    [FromServices] IValidator<RefreshTokenDto> validator)
+    {
+        await validator.ValidateAndThrowAsync(dto);
+
+        AuthenticationResult result =
+            await authService.RefreshAsync(dto);
+
+        if (!result.Succeeded)
+        {
+            return Problem(
+                detail: "Invalid or expired refresh token.",
                 statusCode: StatusCodes.Status401Unauthorized,
                 extensions: new Dictionary<string, object?>
                 {
