@@ -2,12 +2,16 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using NexaERP.DAL.Context;
+using NexaERP.DAL.Database.Configurations.Identity;
+using NexaERP.DAL.Entities;
 
 namespace NexaERP.DAL.Database;
 
 public sealed class ApplicationIdentityDbContext(DbContextOptions<ApplicationIdentityDbContext> options)
     : IdentityDbContext(options)
 {
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -21,5 +25,8 @@ public sealed class ApplicationIdentityDbContext(DbContextOptions<ApplicationIde
         builder.Entity<IdentityUserClaim<string>>().ToTable("asp_net_user_claims");
         builder.Entity<IdentityUserLogin<string>>().ToTable("asp_net_user_logins");
         builder.Entity<IdentityUserToken<string>>().ToTable("asp_net_user_tokens");
+
+        builder.ApplyConfiguration(new RefreshTokenConfiguration());
+
     }
 }

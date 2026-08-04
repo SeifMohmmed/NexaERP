@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NexaERP.DAL.Entities;
 
-namespace NexaERP.DAL.Database.Configurations;
+namespace NexaERP.DAL.Database.Configurations.Application;
 
 internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 {

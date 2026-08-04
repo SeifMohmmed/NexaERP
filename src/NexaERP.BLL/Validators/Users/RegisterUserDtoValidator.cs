@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using NexaERP.BLL.DTOs.Users;
+using NexaERP.BLL.DTOs.Auth;
 
 namespace NexaERP.BLL.Validators.Users;
 

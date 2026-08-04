@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -78,9 +79,16 @@ public sealed class TokenProvider(IOptions<JwtAuthOptions> options)
         return accessToken;
     }
 
-    private string GenerateRefreshToken()
+    /// <summary>
+    /// Generates a cryptographically secure refresh token.
+    /// </summary>
+    private static string GenerateRefreshToken()
     {
-        return string.Empty;
+        // Generate secure random bytes
+        byte[] randomBytes = RandomNumberGenerator.GetBytes(32);
+
+        // Convert to Base64 string for storage/transmission
+        return Convert.ToBase64String(randomBytes);
     }
 
 }

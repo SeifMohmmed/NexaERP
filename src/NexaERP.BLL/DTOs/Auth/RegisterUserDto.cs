@@ -1,4 +1,4 @@
-﻿namespace NexaERP.BLL.DTOs.Users;
+﻿namespace NexaERP.BLL.DTOs.Auth;
 
 public sealed record RegisterUserDto
 {
