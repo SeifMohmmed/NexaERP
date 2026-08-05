@@ -5,6 +5,7 @@ using NexaERP.API.Services;
 using NexaERP.BLL.DTOs.Common;
 using NexaERP.BLL.DTOs.Employee;
 using NexaERP.BLL.Mappings;
+using NexaERP.DAL.Identity;
 using NexaERP.DAL.Repositories.Abstraction;
 
 namespace NexaERP.API.Controllers;
@@ -19,6 +20,7 @@ public class EmployeesController(
     : ControllerBase
 {
 
+    [Authorize(Roles = $"{Roles.Admin},{Roles.HR}")]
     [HttpGet]
     public async Task<ActionResult<PaginationResult<EmployeeDto>>> GetEmployees(
     [FromQuery] EmployeeQueryParameters query)
@@ -52,6 +54,7 @@ public class EmployeesController(
         return Ok(result);
     }
 
+    [Authorize(Roles = $"{Roles.Admin},{Roles.HR}")]
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<EmployeeDto>> GetById(
     Guid id,
@@ -76,6 +79,7 @@ public class EmployeesController(
     }
 
 
+    [Authorize(Roles = $"{Roles.Admin},{Roles.HR}")]
     [HttpPost]
     public async Task<ActionResult<EmployeeDto>> Create(
     [FromBody] CreateEmployeeDto dto,
@@ -109,6 +113,7 @@ public class EmployeesController(
             employeeDto);
     }
 
+    [Authorize(Roles = $"{Roles.Admin},{Roles.HR}")]
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(
     Guid id,
@@ -134,6 +139,7 @@ public class EmployeesController(
         return NoContent();
     }
 
+    [Authorize(Roles = Roles.Admin)]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using NexaERP.BLL.DTOs.Auth;
+using NexaERP.DAL.Identity;
 using NexaERP.DAL.Settings;
 
 namespace NexaERP.BLL.Services;
@@ -50,6 +51,10 @@ public sealed class TokenProvider(IOptions<JwtAuthOptions> options)
 
             // User email
             new (JwtRegisteredClaimNames.Email, tokenRequest.Email),
+
+            // Add a role claim for each user role
+            ..tokenRequest.Roles.Select(role=>
+            new Claim(JwtCustomClaimNames.Role,role))
         ];
 
         // Token descriptor contains metadata + signing info

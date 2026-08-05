@@ -2,19 +2,20 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NexaERP.BLL.DTOs.Users;
+using NexaERP.DAL.Identity;
 using NexaERP.DAL.Repositories.Abstraction;
 using NexaERP.DAL.Services;
 
 namespace NexaERP.API.Controllers;
 
-[Authorize]
 [Route("users")]
 [ApiController]
 public sealed class UsersController(
     IUserRepository userRepository,
     UserContext userContext) : ControllerBase
 {
-    [HttpGet("{id}")]
+    [Authorize(Roles = Roles.Admin)]
+    [HttpGet("{id:guid}")]
     public async Task<ActionResult<UserDto>> GetUserById(Guid id)
     {
         Guid? currentUserId = await userContext.GetUserIdAsync();
@@ -39,6 +40,7 @@ public sealed class UsersController(
 
     }
 
+    [Authorize]
     [HttpGet("me")]
     public async Task<ActionResult<UserDto>> GetCurrentUser()
     {

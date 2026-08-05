@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NexaERP.BLL.DTOs.Category;
 using NexaERP.BLL.Mappings;
+using NexaERP.DAL.Identity;
 using NexaERP.DAL.Repositories.Abstraction;
 
 namespace NexaERP.API.Controllers;
@@ -14,6 +15,8 @@ public class CategoriesController(
     ICategoryRepository categoryRepository)
     : ControllerBase
 {
+    [Authorize(Roles =
+    $"{Roles.Admin},{Roles.Purchasing},{Roles.Warehouse}")]
     [HttpGet]
     public async Task<ActionResult<List<CategoryDto>>> GetCategories()
     {

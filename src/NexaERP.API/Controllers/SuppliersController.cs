@@ -6,6 +6,7 @@ using NexaERP.BLL.DTOs.Common;
 using NexaERP.BLL.DTOs.Supplier;
 using NexaERP.BLL.Mappings;
 using NexaERP.DAL.Entities;
+using NexaERP.DAL.Identity;
 using NexaERP.DAL.Repositories.Abstraction;
 namespace NexaERP.API.Controllers;
 
@@ -17,7 +18,8 @@ public class SuppliersController(
     LinkService linkService,
     IUnitOfWork unitOfWork) : ControllerBase
 {
-
+    [Authorize(Roles =
+        $"{Roles.Admin},{Roles.Purchasing},{Roles.Accountant}")]
     [HttpGet]
     public async Task<ActionResult<PaginationResult<SupplierDto>>> GetSuppliers(
         [FromQuery] SupplierQueryParameters query)
@@ -48,7 +50,8 @@ public class SuppliersController(
 
         return Ok(result);
     }
-
+    [Authorize(Roles =
+        $"{Roles.Admin},{Roles.Purchasing},{Roles.Accountant}")]
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<SupplierDto>> GetById(
         Guid id,
@@ -71,6 +74,8 @@ public class SuppliersController(
         return Ok(supplierDto);
     }
 
+    [Authorize(Roles =
+        $"{Roles.Admin},{Roles.Purchasing}")]
     [HttpPost]
     public async Task<ActionResult<SupplierDto>> Create(
        [FromBody] CreateSupplierDto dto,
@@ -93,6 +98,8 @@ public class SuppliersController(
             supplierDto);
     }
 
+    [Authorize(Roles =
+        $"{Roles.Admin},{Roles.Purchasing}")]
     [HttpPut("{id:guid}")]
     public async Task<ActionResult> Update(
         Guid id,
@@ -117,6 +124,7 @@ public class SuppliersController(
         return NoContent();
     }
 
+    [Authorize(Roles = Roles.Admin)]
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult> Delete(Guid id)
     {

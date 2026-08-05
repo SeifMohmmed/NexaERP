@@ -22,6 +22,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 
     await app.ApplyMigrationsAsync();
+    await app.SeedInitialDataAsync();
+    await app.SeedAdminUserAsync();
 
 }
 

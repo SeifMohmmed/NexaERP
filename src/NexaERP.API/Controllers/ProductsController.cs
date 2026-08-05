@@ -6,6 +6,7 @@ using NexaERP.BLL.DTOs.Common;
 using NexaERP.BLL.DTOs.Product;
 using NexaERP.BLL.Mappings;
 using NexaERP.DAL.Entities;
+using NexaERP.DAL.Identity;
 using NexaERP.DAL.Repositories.Abstraction;
 
 namespace NexaERP.API.Controllers;
@@ -18,6 +19,8 @@ public class ProductsController(
     IUnitOfWork unitOfWork,
     LinkService linkService) : ControllerBase
 {
+    [Authorize(Roles =
+    $"{Roles.Admin},{Roles.Purchasing},{Roles.Warehouse}")]
     [HttpGet]
     public async Task<ActionResult<PaginationResult<ProductDto>>> GetProducts(
     [FromQuery] ProductQueryParameters query)
@@ -48,6 +51,8 @@ public class ProductsController(
         return Ok(result);
     }
 
+    [Authorize(Roles =
+        $"{Roles.Admin},{Roles.Purchasing},{Roles.Warehouse}")]
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<ProductDto>> GetById(
         Guid id,
@@ -70,6 +75,8 @@ public class ProductsController(
         return Ok(dto);
     }
 
+    [Authorize(Roles =
+    $"{Roles.Admin},{Roles.Purchasing}")]
     [HttpPost]
     public async Task<ActionResult<ProductDto>> Create(
     [FromBody] CreateProductDto dto,
@@ -93,6 +100,8 @@ public class ProductsController(
             productDto);
     }
 
+    [Authorize(Roles =
+         $"{Roles.Admin},{Roles.Purchasing}")]
     [HttpPut("{id:guid}")]
     public async Task<ActionResult> Update(
     Guid id,
@@ -117,6 +126,8 @@ public class ProductsController(
         return NoContent();
     }
 
+    [Authorize(Roles =
+        $"{Roles.Admin},{Roles.Warehouse}")]
     [HttpPatch("{id:guid}/stock")]
     public async Task<ActionResult> AdjustStock(
     Guid id,
@@ -141,6 +152,7 @@ public class ProductsController(
         return NoContent();
     }
 
+    [Authorize(Roles = Roles.Admin)]
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult> Delete(Guid id)
     {

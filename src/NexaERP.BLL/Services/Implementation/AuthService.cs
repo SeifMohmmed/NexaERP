@@ -7,6 +7,7 @@ using NexaERP.BLL.Mappings;
 using NexaERP.BLL.Services.Abstraction;
 using NexaERP.DAL.Database;
 using NexaERP.DAL.Entities;
+using NexaERP.DAL.Identity;
 using NexaERP.DAL.Repositories.Abstraction;
 using NexaERP.DAL.Settings;
 
@@ -49,18 +50,34 @@ public sealed class AuthService(
         };
 
         // Create the Identity account.
-        IdentityResult result =
+        IdentityResult createUserResult =
             await userManager.CreateAsync(
                 identityUser,
                 dto.Password);
 
         // Return validation errors if registration fails.
-        if (!result.Succeeded)
+        if (!createUserResult.Succeeded)
         {
             return new AuthenticationResult
             {
                 Succeeded = false,
-                Errors = result.Errors.ToDictionary(
+                Errors = createUserResult.Errors.ToDictionary(
+                    e => e.Code,
+                    e => e.Description)
+            };
+        }
+
+        IdentityResult addToRoleResult =
+         await userManager.AddToRoleAsync(
+            identityUser,
+            Roles.Sales);
+
+        if (!addToRoleResult.Succeeded)
+        {
+            return new AuthenticationResult
+            {
+                Succeeded = false,
+                Errors = addToRoleResult.Errors.ToDictionary(
                     e => e.Code,
                     e => e.Description)
             };
@@ -77,10 +94,15 @@ public sealed class AuthService(
 
         await unitOfWork.SaveChangesAsync();
 
+        // Get the user's roles.
+        IList<string> roles =
+            await userManager.GetRolesAsync(identityUser);
+
         // Generate access and refresh tokens.
         var tokenRequest = new TokenRequest(
             identityUser.Id,
-            identityUser.Email);
+            identityUser.Email,
+            roles);
 
         AccessTokenDto accessToken =
             tokenProvider.Create(tokenRequest);
@@ -135,10 +157,14 @@ public sealed class AuthService(
             };
         }
 
+        IList<string> roles =
+            await userManager.GetRolesAsync(identityUser);
+
         // Generate access and refresh tokens.
         var tokenRequest = new TokenRequest(
             identityUser.Id,
-            identityUser.Email!);
+            identityUser.Email!,
+            roles);
 
         AccessTokenDto accessToken =
             tokenProvider.Create(tokenRequest);
@@ -202,10 +228,14 @@ public sealed class AuthService(
             };
         }
 
+        IList<string> roles =
+             await userManager.GetRolesAsync(refreshToken.User);
+
         // Generate a new access and refresh token.
         var tokenRequest = new TokenRequest(
             refreshToken.User.Id,
-            refreshToken.User.Email!);
+            refreshToken.User.Email!,
+            roles);
 
         AccessTokenDto accessToken =
             tokenProvider.Create(tokenRequest);

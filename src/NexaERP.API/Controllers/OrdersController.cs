@@ -6,6 +6,7 @@ using NexaERP.BLL.DTOs.Common;
 using NexaERP.BLL.DTOs.Order;
 using NexaERP.BLL.Mappings;
 using NexaERP.DAL.Enums;
+using NexaERP.DAL.Identity;
 using NexaERP.DAL.Repositories.Abstraction;
 using NexaERP.DAL.Services;
 
@@ -21,6 +22,8 @@ public class OrdersController(
     UserContext userContext)
     : ControllerBase
 {
+    [Authorize(Roles =
+        $"{Roles.Admin},{Roles.Sales},{Roles.Warehouse},{Roles.Accountant}")]
     [HttpGet]
     public async Task<ActionResult<PaginationResult<OrderDto>>> GetOrders(
         [FromQuery] OrderQueryParameters query)
@@ -64,6 +67,8 @@ public class OrdersController(
         return Ok(result);
     }
 
+    [Authorize(Roles =
+        $"{Roles.Admin},{Roles.Sales},{Roles.Warehouse},{Roles.Accountant}")]
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<OrderDto>> GetById(
         Guid id,
@@ -95,6 +100,8 @@ public class OrdersController(
         return Ok(dto);
     }
 
+    [Authorize(Roles =
+        $"{Roles.Admin},{Roles.Sales}")]
     [HttpPost]
     public async Task<ActionResult<OrderDto>> Create(
         [FromBody] CreateOrderDto dto,
@@ -126,6 +133,8 @@ public class OrdersController(
             orderDto);
     }
 
+    [Authorize(Roles =
+        $"{Roles.Admin},{Roles.Sales}")]
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(
         Guid id,
@@ -159,6 +168,8 @@ public class OrdersController(
         return NoContent();
     }
 
+    [Authorize(Roles =
+        $"{Roles.Admin},{Roles.Warehouse}")]
     [HttpPatch("{id:guid}/status")]
     public async Task<IActionResult> UpdateStatus(
         Guid id,
@@ -198,6 +209,7 @@ public class OrdersController(
         return NoContent();
     }
 
+    [Authorize(Roles = Roles.Admin)]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

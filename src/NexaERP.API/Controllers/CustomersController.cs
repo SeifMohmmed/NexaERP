@@ -5,6 +5,7 @@ using NexaERP.API.Services;
 using NexaERP.BLL.DTOs.Common;
 using NexaERP.BLL.DTOs.Customer;
 using NexaERP.BLL.Mappings;
+using NexaERP.DAL.Identity;
 using NexaERP.DAL.Repositories.Abstraction;
 namespace NexaERP.API.Controllers;
 
@@ -16,6 +17,8 @@ public class CustomersController(
     LinkService linkService,
     IUnitOfWork unitOfWork) : ControllerBase
 {
+    [Authorize(Roles =
+    $"{Roles.Admin},{Roles.Sales},{Roles.Accountant}")]
     [HttpGet]
     public async Task<ActionResult<PaginationResult<CustomerDto>>> GetCustomers(
         [FromQuery] CustomerQueryParameters query)
@@ -45,6 +48,8 @@ public class CustomersController(
         return Ok(result);
     }
 
+    [Authorize(Roles =
+        $"{Roles.Admin},{Roles.Sales},{Roles.Accountant}")]
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<CustomerDto>> GetById(
         Guid id,
@@ -68,6 +73,8 @@ public class CustomersController(
 
     }
 
+    [Authorize(Roles =
+        $"{Roles.Admin},{Roles.Sales}")]
     [HttpPost]
     public async Task<ActionResult<CustomerDto>> Create(
        [FromBody] CreateCustomerDto dto,
@@ -89,6 +96,8 @@ public class CustomersController(
             customerDto);
     }
 
+    [Authorize(Roles =
+        $"{Roles.Admin},{Roles.Sales}")]
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<CustomerDto>> Update(
         Guid id,
@@ -113,6 +122,7 @@ public class CustomersController(
         return NoContent();
     }
 
+    [Authorize(Roles = Roles.Admin)]
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult> Delete(Guid id)
     {

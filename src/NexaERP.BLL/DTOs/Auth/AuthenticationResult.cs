@@ -1,10 +1,8 @@
-﻿namespace NexaERP.BLL.DTOs.Auth;
+﻿using NexaERP.BLL.DTOs.Common;
 
-public class AuthenticationResult
+namespace NexaERP.BLL.DTOs.Auth;
+
+public class AuthenticationResult : Result
 {
-    public bool Succeeded { get; init; }
-
     public AccessTokenDto? Token { get; init; }
-
-    public Dictionary<string, string>? Errors { get; init; }
 }

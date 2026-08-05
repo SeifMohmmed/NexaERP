@@ -7,11 +7,11 @@ using NexaERP.BLL.DTOs.Invoice;
 using NexaERP.BLL.DTOs.InvoiceLine;
 using NexaERP.BLL.Mappings;
 using NexaERP.DAL.Enums;
+using NexaERP.DAL.Identity;
 using NexaERP.DAL.Repositories.Abstraction;
 
 namespace NexaERP.API.Controllers;
 
-[Authorize]
 [Route("invoices")]
 [ApiController]
 public class InvoicesController(
@@ -20,6 +20,8 @@ public class InvoicesController(
     LinkService linkService,
     InvoicePdfService invoicePdfService) : ControllerBase
 {
+    [Authorize(Roles =
+    $"{Roles.Admin},{Roles.Sales},{Roles.Accountant}")]
     [HttpGet]
     public async Task<ActionResult<PaginationResult<InvoiceDto>>> GetInvoices(
     [FromQuery] InvoiceQueryParameters query)
@@ -58,6 +60,8 @@ public class InvoicesController(
     }
 
 
+    [Authorize(Roles =
+        $"{Roles.Admin},{Roles.Sales},{Roles.Accountant}")]
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<InvoiceDto>> GetById(
     Guid id,
@@ -85,6 +89,8 @@ public class InvoicesController(
     }
 
 
+    [Authorize(Roles =
+        $"{Roles.Admin},{Roles.Sales},{Roles.Accountant}")]
     [HttpGet("{id:guid}/pdf")]
     public async Task<IActionResult> DownloadPdf(Guid id)
     {
@@ -106,6 +112,8 @@ public class InvoicesController(
     }
 
 
+    [Authorize(Roles =
+        $"{Roles.Admin},{Roles.Sales}")]
     [HttpPost]
     public async Task<ActionResult<InvoiceDto>> Create(
     [FromBody] CreateInvoiceDto dto,
@@ -140,6 +148,8 @@ public class InvoicesController(
     }
 
 
+    [Authorize(Roles =
+        $"{Roles.Admin},{Roles.Sales}")]
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(
     Guid id,
@@ -166,6 +176,8 @@ public class InvoicesController(
     }
 
 
+    [Authorize(Roles =
+        $"{Roles.Admin},{Roles.Accountant}")]
     [HttpPatch("{id:guid}/pay")]
     public async Task<IActionResult> Pay(
     Guid id,
@@ -199,6 +211,8 @@ public class InvoicesController(
     }
 
 
+    [Authorize(Roles =
+        $"{Roles.Admin}")]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
