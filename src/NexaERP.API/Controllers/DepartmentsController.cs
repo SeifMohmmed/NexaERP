@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NexaERP.BLL.DTOs.Department;
 using NexaERP.BLL.Mappings;
+using NexaERP.DAL.Identity;
 using NexaERP.DAL.Repositories.Abstraction;
 
 namespace NexaERP.API.Controllers;
@@ -15,6 +16,7 @@ public class DepartmentsController(
     IDepartmentRepository repository)
     : ControllerBase
 {
+    [Authorize(Roles = $"{Roles.Admin},{Roles.HR}")]
     [HttpGet]
     public async Task<ActionResult<List<DepartmentDto>>> GetDepartments()
     {
@@ -28,6 +30,7 @@ public class DepartmentsController(
         return Ok(departments);
     }
 
+    [Authorize(Roles = $"{Roles.Admin},{Roles.HR}")]
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<DepartmentDto>> GetById(Guid id)
     {
@@ -41,6 +44,7 @@ public class DepartmentsController(
         return Ok(department.ToDto());
     }
 
+    [Authorize(Roles = $"{Roles.Admin},{Roles.HR}")]
     [HttpPost]
     public async Task<ActionResult<DepartmentDto>> Create(
     [FromBody] CreateDepartmentDto dto,

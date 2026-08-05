@@ -88,6 +88,7 @@ public static class DependencyInjection
         builder.Services.AddTransient<TokenProvider>();
 
         builder.Services.AddScoped<IAuthService, AuthService>();
+        builder.Services.AddScoped<IRoleService, RoleService>();
 
         return builder;
     }
