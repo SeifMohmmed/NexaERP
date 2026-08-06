@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NexaERP.BLL.DTOs.Users;
-using NexaERP.DAL.Identity;
+using NexaERP.DAL.Authorization;
 using NexaERP.DAL.Repositories.Abstraction;
 using NexaERP.DAL.Services;
 
@@ -14,8 +13,8 @@ public sealed class UsersController(
     IUserRepository userRepository,
     UserContext userContext) : ControllerBase
 {
-    [Authorize(Roles = Roles.Admin)]
     [HttpGet("{id:guid}")]
+    [HasPermission(Permissions.UsersRead)]
     public async Task<ActionResult<UserDto>> GetUserById(Guid id)
     {
         Guid? currentUserId = await userContext.GetUserIdAsync();
@@ -40,8 +39,8 @@ public sealed class UsersController(
 
     }
 
-    [Authorize]
     [HttpGet("me")]
+    [HasPermission(Permissions.UsersRead)]
     public async Task<ActionResult<UserDto>> GetCurrentUser()
     {
         Guid? userId = await userContext.GetUserIdAsync();
@@ -63,5 +62,23 @@ public sealed class UsersController(
         }
 
         return Ok(user);
+    }
+
+    [HttpGet("me/permissions")]
+    [HasPermission(Permissions.UsersRead)]
+    public async Task<IActionResult> GetPermissions(
+        [FromServices] AuthorizationService authorizationService)
+    {
+        string identityId = userContext.GetIdentityId();
+
+        if (identityId is null)
+        {
+            return Unauthorized();
+        }
+
+        HashSet<string> permissions =
+            await authorizationService.GetPermissionsForUserAsync(identityId);
+
+        return Ok(permissions);
     }
 }

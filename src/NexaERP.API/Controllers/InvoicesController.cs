@@ -1,13 +1,12 @@
 ﻿using FluentValidation;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NexaERP.API.Services;
 using NexaERP.BLL.DTOs.Common;
 using NexaERP.BLL.DTOs.Invoice;
 using NexaERP.BLL.DTOs.InvoiceLine;
 using NexaERP.BLL.Mappings;
+using NexaERP.DAL.Authorization;
 using NexaERP.DAL.Enums;
-using NexaERP.DAL.Identity;
 using NexaERP.DAL.Repositories.Abstraction;
 
 namespace NexaERP.API.Controllers;
@@ -20,9 +19,8 @@ public class InvoicesController(
     LinkService linkService,
     InvoicePdfService invoicePdfService) : ControllerBase
 {
-    [Authorize(Roles =
-    $"{Roles.Admin},{Roles.Sales},{Roles.Accountant}")]
     [HttpGet]
+    [HasPermission(Permissions.InvoicesRead)]
     public async Task<ActionResult<PaginationResult<InvoiceDto>>> GetInvoices(
     [FromQuery] InvoiceQueryParameters query)
     {
@@ -60,9 +58,8 @@ public class InvoicesController(
     }
 
 
-    [Authorize(Roles =
-        $"{Roles.Admin},{Roles.Sales},{Roles.Accountant}")]
     [HttpGet("{id:guid}")]
+    [HasPermission(Permissions.InvoicesRead)]
     public async Task<ActionResult<InvoiceDto>> GetById(
     Guid id,
     [FromQuery] InvoiceQueryParameters query)
@@ -89,9 +86,8 @@ public class InvoicesController(
     }
 
 
-    [Authorize(Roles =
-        $"{Roles.Admin},{Roles.Sales},{Roles.Accountant}")]
     [HttpGet("{id:guid}/pdf")]
+    [HasPermission(Permissions.InvoicesRead)]
     public async Task<IActionResult> DownloadPdf(Guid id)
     {
         var invoice = await invoiceRepository.GetWithLinesAsync(id);
@@ -112,9 +108,8 @@ public class InvoicesController(
     }
 
 
-    [Authorize(Roles =
-        $"{Roles.Admin},{Roles.Sales}")]
     [HttpPost]
+    [HasPermission(Permissions.InvoicesCreate)]
     public async Task<ActionResult<InvoiceDto>> Create(
     [FromBody] CreateInvoiceDto dto,
     [FromServices] IValidator<CreateInvoiceDto> validator)
@@ -148,9 +143,8 @@ public class InvoicesController(
     }
 
 
-    [Authorize(Roles =
-        $"{Roles.Admin},{Roles.Sales}")]
     [HttpPut("{id:guid}")]
+    [HasPermission(Permissions.InvoicesUpdate)]
     public async Task<IActionResult> Update(
     Guid id,
     [FromBody] UpdateInvoiceDto dto,
@@ -176,9 +170,8 @@ public class InvoicesController(
     }
 
 
-    [Authorize(Roles =
-        $"{Roles.Admin},{Roles.Accountant}")]
     [HttpPatch("{id:guid}/pay")]
+    [HasPermission(Permissions.InvoicesPay)]
     public async Task<IActionResult> Pay(
     Guid id,
     [FromBody] PayInvoiceDto dto,
@@ -211,9 +204,8 @@ public class InvoicesController(
     }
 
 
-    [Authorize(Roles =
-        $"{Roles.Admin}")]
     [HttpDelete("{id:guid}")]
+    [HasPermission(Permissions.InvoicesDelete)]
     public async Task<IActionResult> Delete(Guid id)
     {
         var invoice =

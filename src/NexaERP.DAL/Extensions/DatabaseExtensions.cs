@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NexaERP.DAL.Authorization;
 using NexaERP.DAL.Database;
 using NexaERP.DAL.Entities;
 using NexaERP.DAL.Identity;
@@ -75,12 +77,58 @@ public static class DatabaseExtensions
                 Roles.HR
             ];
 
-            foreach (string role in roles)
+            foreach (string roleName in roles)
             {
-                if (!await roleManager.RoleExistsAsync(role))
+                IdentityRole? role =
+                    await roleManager.FindByNameAsync(roleName);
+
+                if (role is null)
                 {
-                    await roleManager.CreateAsync(
-                        new IdentityRole(role));
+                    role = new IdentityRole(roleName);
+
+                    IdentityResult createRoleResult =
+                        await roleManager.CreateAsync(role);
+
+                    if (!createRoleResult.Succeeded)
+                    {
+                        throw new InvalidOperationException(
+                            string.Join(
+                                Environment.NewLine,
+                                createRoleResult.Errors.Select(e => e.Description)));
+                    }
+                }
+
+                if (!RoleClaims.Map.TryGetValue(
+                    roleName,
+                    out IReadOnlyCollection<string>? permissions))
+                {
+                    continue;
+                }
+
+                IList<Claim> existingClaims =
+                    await roleManager.GetClaimsAsync(role);
+
+                foreach (string permission in permissions)
+                {
+                    if (existingClaims.Any(c =>
+                        c.Type == JwtCustomClaimNames.Permission &&
+                        c.Value == permission))
+                    {
+                        continue;
+                    }
+
+                    IdentityResult addClaimResult =
+                        await roleManager.AddClaimAsync(
+                            role,
+                            new Claim(
+                                JwtCustomClaimNames.Permission,
+                                permission));
+
+                    if (!addClaimResult.Succeeded)
+                    {
+                        throw new InvalidOperationException(
+                            $"Failed to assign permission '{permission}' to role '{roleName}'.");
+                    }
                 }
             }
 

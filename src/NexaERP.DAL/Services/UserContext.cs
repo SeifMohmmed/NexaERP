@@ -59,4 +59,12 @@ public sealed class UserContext(
 
         return userId;
     }
+
+    // Returns the current user's Identity ID.
+    public string? GetIdentityId()
+    {
+        return httpContextAccessor.HttpContext?
+            .User
+            .GetIdentityId();
+    }
 }

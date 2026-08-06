@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -43,8 +44,20 @@ public static class DependencyInjection
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
+        // Register in-memory caching.
         services.AddMemoryCache();
+
+        // Register user context service.
         services.AddScoped<UserContext>();
+
+        // Register dynamic authorization policy provider.
+        services.AddTransient<
+            IAuthorizationHandler,
+            PermissionAuthorizationHandler>();
+
+        // Register authorization service.
+        services.AddScoped<AuthorizationService>();
+
         return services;
     }
 
@@ -53,6 +66,7 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        // Register the application database context.
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(
                 configuration.GetConnectionString("Database"),
@@ -62,6 +76,7 @@ public static class DependencyInjection
                         Schemas.Application))
             .UseSnakeCaseNamingConvention());
 
+        // Register the Identity database context.
         services.AddDbContext<ApplicationIdentityDbContext>(options =>
             options.UseNpgsql(
                 configuration.GetConnectionString("Database"),

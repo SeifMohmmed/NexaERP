@@ -5,8 +5,8 @@ using NexaERP.API.Services;
 using NexaERP.BLL.DTOs.Common;
 using NexaERP.BLL.DTOs.Product;
 using NexaERP.BLL.Mappings;
+using NexaERP.DAL.Authorization;
 using NexaERP.DAL.Entities;
-using NexaERP.DAL.Identity;
 using NexaERP.DAL.Repositories.Abstraction;
 
 namespace NexaERP.API.Controllers;
@@ -19,9 +19,8 @@ public class ProductsController(
     IUnitOfWork unitOfWork,
     LinkService linkService) : ControllerBase
 {
-    [Authorize(Roles =
-    $"{Roles.Admin},{Roles.Purchasing},{Roles.Warehouse}")]
     [HttpGet]
+    [HasPermission(Permissions.ProductsRead)]
     public async Task<ActionResult<PaginationResult<ProductDto>>> GetProducts(
     [FromQuery] ProductQueryParameters query)
     {
@@ -51,9 +50,8 @@ public class ProductsController(
         return Ok(result);
     }
 
-    [Authorize(Roles =
-        $"{Roles.Admin},{Roles.Purchasing},{Roles.Warehouse}")]
     [HttpGet("{id:guid}")]
+    [HasPermission(Permissions.ProductsRead)]
     public async Task<ActionResult<ProductDto>> GetById(
         Guid id,
         [FromQuery] ProductQueryParameters query)
@@ -75,9 +73,8 @@ public class ProductsController(
         return Ok(dto);
     }
 
-    [Authorize(Roles =
-    $"{Roles.Admin},{Roles.Purchasing}")]
     [HttpPost]
+    [HasPermission(Permissions.ProductsCreate)]
     public async Task<ActionResult<ProductDto>> Create(
     [FromBody] CreateProductDto dto,
     [FromServices] IValidator<CreateProductDto> validator)
@@ -100,9 +97,8 @@ public class ProductsController(
             productDto);
     }
 
-    [Authorize(Roles =
-         $"{Roles.Admin},{Roles.Purchasing}")]
     [HttpPut("{id:guid}")]
+    [HasPermission(Permissions.ProductsUpdate)]
     public async Task<ActionResult> Update(
     Guid id,
     [FromBody] UpdateProductDto dto,
@@ -126,9 +122,8 @@ public class ProductsController(
         return NoContent();
     }
 
-    [Authorize(Roles =
-        $"{Roles.Admin},{Roles.Warehouse}")]
     [HttpPatch("{id:guid}/stock")]
+    [HasPermission(Permissions.ProductsAdjustStock)]
     public async Task<ActionResult> AdjustStock(
     Guid id,
     [FromBody] AdjustStockDto dto,
@@ -152,8 +147,8 @@ public class ProductsController(
         return NoContent();
     }
 
-    [Authorize(Roles = Roles.Admin)]
     [HttpDelete("{id:guid}")]
+    [HasPermission(Permissions.ProductsDelete)]
     public async Task<ActionResult> Delete(Guid id)
     {
         Product? product = await productRepository.GetByIdAsync(id);
