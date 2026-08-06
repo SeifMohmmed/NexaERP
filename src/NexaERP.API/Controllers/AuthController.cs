@@ -1,8 +1,10 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using NexaERP.BLL.DTOs.Auth;
 using NexaERP.BLL.Services.Abstraction;
+using NexaERP.DAL.Extensions;
 
 namespace NexaERP.API.Controllers;
 
@@ -14,6 +16,7 @@ public sealed class AuthController(
     : ControllerBase
 {
     [HttpPost("register")]
+    [EnableRateLimiting(RateLimitingPolicies.Auth)]
     public async Task<ActionResult<AccessTokenDto>> Register(
         RegisterUserDto dto,
         [FromServices] IValidator<RegisterUserDto> validator)
@@ -37,6 +40,7 @@ public sealed class AuthController(
     }
 
     [HttpPost("login")]
+    [EnableRateLimiting(RateLimitingPolicies.Auth)]
     public async Task<ActionResult<AccessTokenDto>> Login(
         [FromBody] LoginUserDto dto,
         [FromServices] IValidator<LoginUserDto> validator)
@@ -60,6 +64,7 @@ public sealed class AuthController(
     }
 
     [HttpPost("refresh")]
+    [EnableRateLimiting(RateLimitingPolicies.Auth)]
     public async Task<ActionResult<AccessTokenDto>> Refresh(
     [FromBody] RefreshTokenDto dto,
     [FromServices] IValidator<RefreshTokenDto> validator)

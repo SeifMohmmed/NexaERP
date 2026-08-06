@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using NexaERP.API.Services;
 using NexaERP.BLL.DTOs.Common;
 using NexaERP.BLL.DTOs.Invoice;
@@ -7,10 +8,12 @@ using NexaERP.BLL.DTOs.InvoiceLine;
 using NexaERP.BLL.Mappings;
 using NexaERP.DAL.Authorization;
 using NexaERP.DAL.Enums;
+using NexaERP.DAL.Extensions;
 using NexaERP.DAL.Repositories.Abstraction;
 
 namespace NexaERP.API.Controllers;
 
+[EnableRateLimiting(RateLimitingPolicies.Default)]
 [Route("invoices")]
 [ApiController]
 public class InvoicesController(
@@ -88,6 +91,7 @@ public class InvoicesController(
 
     [HttpGet("{id:guid}/pdf")]
     [HasPermission(Permissions.InvoicesRead)]
+    [EnableRateLimiting(RateLimitingPolicies.Heavy)]
     public async Task<IActionResult> DownloadPdf(Guid id)
     {
         var invoice = await invoiceRepository.GetWithLinesAsync(id);

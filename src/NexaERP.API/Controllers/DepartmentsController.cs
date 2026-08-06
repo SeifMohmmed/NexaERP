@@ -1,14 +1,17 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using NexaERP.BLL.DTOs.Department;
 using NexaERP.BLL.Mappings;
 using NexaERP.DAL.Authorization;
+using NexaERP.DAL.Extensions;
 using NexaERP.DAL.Repositories.Abstraction;
 
 namespace NexaERP.API.Controllers;
 
+[EnableRateLimiting(RateLimitingPolicies.Default)]
 [Authorize]
 [Route("departments")]
 [ApiController]

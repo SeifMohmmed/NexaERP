@@ -1,12 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using NexaERP.BLL.DTOs.Common;
 using NexaERP.BLL.DTOs.Roles;
 using NexaERP.BLL.Services.Abstraction;
+using NexaERP.DAL.Extensions;
 using NexaERP.DAL.Identity;
 
 namespace NexaERP.API.Controllers;
 
+[EnableRateLimiting(RateLimitingPolicies.Default)]
 [Authorize(Roles = Roles.Admin)]
 [Route("roles")]
 [ApiController]
