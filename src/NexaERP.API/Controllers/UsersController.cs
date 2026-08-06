@@ -1,12 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using NexaERP.BLL.DTOs.Users;
 using NexaERP.DAL.Authorization;
+using NexaERP.DAL.Extensions;
 using NexaERP.DAL.Repositories.Abstraction;
 using NexaERP.DAL.Services;
 
 namespace NexaERP.API.Controllers;
 
+[EnableRateLimiting(RateLimitingPolicies.Default)]
 [Route("users")]
 [ApiController]
 public sealed class UsersController(

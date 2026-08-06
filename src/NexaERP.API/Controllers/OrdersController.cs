@@ -1,17 +1,20 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using NexaERP.API.Services;
 using NexaERP.BLL.DTOs.Common;
 using NexaERP.BLL.DTOs.Order;
 using NexaERP.BLL.Mappings;
 using NexaERP.DAL.Authorization;
 using NexaERP.DAL.Enums;
+using NexaERP.DAL.Extensions;
 using NexaERP.DAL.Repositories.Abstraction;
 using NexaERP.DAL.Services;
 
 namespace NexaERP.API.Controllers;
 
+[EnableRateLimiting(RateLimitingPolicies.Default)]
 [Authorize]
 [Route("orders")]
 [ApiController]

@@ -30,6 +30,8 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
+app.UseRateLimiter();
+
 app.MapControllers();
 
 await app.RunAsync().ConfigureAwait(false);
