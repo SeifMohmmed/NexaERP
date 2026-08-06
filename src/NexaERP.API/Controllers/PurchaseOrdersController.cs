@@ -5,7 +5,7 @@ using NexaERP.API.Services;
 using NexaERP.BLL.DTOs.Common;
 using NexaERP.BLL.DTOs.PurchaseOrder;
 using NexaERP.BLL.Mappings;
-using NexaERP.DAL.Identity;
+using NexaERP.DAL.Authorization;
 using NexaERP.DAL.Repositories.Abstraction;
 using NexaERP.DAL.Services;
 
@@ -21,9 +21,8 @@ public class PurchaseOrdersController(
     UserContext userContext)
     : ControllerBase
 {
-    [Authorize(Roles =
-        $"{Roles.Admin},{Roles.Purchasing},{Roles.Warehouse},{Roles.Accountant}")]
     [HttpGet]
+    [HasPermission(Permissions.PurchaseOrdersRead)]
     public async Task<ActionResult<PaginationResult<PurchaseOrderDto>>> GetPurchaseOrders(
     [FromQuery] PurchaseOrderQueryParameters query)
     {
@@ -62,9 +61,8 @@ public class PurchaseOrdersController(
         return Ok(result);
     }
 
-    [Authorize(Roles =
-        $"{Roles.Admin},{Roles.Purchasing},{Roles.Warehouse},{Roles.Accountant}")]
     [HttpGet("{id:guid}")]
+    [HasPermission(Permissions.PurchaseOrdersRead)]
     public async Task<ActionResult<PurchaseOrderDto>> GetById(
         Guid id,
         [FromQuery] PurchaseOrderQueryParameters query)
@@ -96,9 +94,8 @@ public class PurchaseOrdersController(
         return Ok(dto);
     }
 
-    [Authorize(Roles =
-        $"{Roles.Admin},{Roles.Purchasing}")]
     [HttpPost]
+    [HasPermission(Permissions.PurchaseOrdersCreate)]
     public async Task<ActionResult<PurchaseOrderDto>> Create(
     [FromBody] CreatePurchaseOrderDto dto,
     [FromServices] IValidator<CreatePurchaseOrderDto> validator)
@@ -129,9 +126,8 @@ public class PurchaseOrdersController(
             purchaseOrderDto);
     }
 
-    [Authorize(Roles =
-        $"{Roles.Admin},{Roles.Purchasing}")]
     [HttpPut("{id:guid}")]
+    [HasPermission(Permissions.PurchaseOrdersUpdate)]
     public async Task<IActionResult> Update(
     Guid id,
     [FromBody] UpdatePurchaseOrderDto dto,
@@ -165,9 +161,8 @@ public class PurchaseOrdersController(
         return NoContent();
     }
 
-    [Authorize(Roles =
-       $"{Roles.Admin},{Roles.Warehouse},{Roles.Accountant}")]
     [HttpPatch("{id:guid}/status")]
+    [HasPermission(Permissions.PurchaseOrdersUpdateStatus)]
     public async Task<IActionResult> UpdateStatus(
     Guid id,
     [FromBody] UpdatePurchaseOrderStatusDto dto,

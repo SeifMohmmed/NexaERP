@@ -5,8 +5,8 @@ using NexaERP.API.Services;
 using NexaERP.BLL.DTOs.Common;
 using NexaERP.BLL.DTOs.Order;
 using NexaERP.BLL.Mappings;
+using NexaERP.DAL.Authorization;
 using NexaERP.DAL.Enums;
-using NexaERP.DAL.Identity;
 using NexaERP.DAL.Repositories.Abstraction;
 using NexaERP.DAL.Services;
 
@@ -22,9 +22,8 @@ public class OrdersController(
     UserContext userContext)
     : ControllerBase
 {
-    [Authorize(Roles =
-        $"{Roles.Admin},{Roles.Sales},{Roles.Warehouse},{Roles.Accountant}")]
     [HttpGet]
+    [HasPermission(Permissions.OrdersRead)]
     public async Task<ActionResult<PaginationResult<OrderDto>>> GetOrders(
         [FromQuery] OrderQueryParameters query)
     {
@@ -67,9 +66,8 @@ public class OrdersController(
         return Ok(result);
     }
 
-    [Authorize(Roles =
-        $"{Roles.Admin},{Roles.Sales},{Roles.Warehouse},{Roles.Accountant}")]
     [HttpGet("{id:guid}")]
+    [HasPermission(Permissions.OrdersRead)]
     public async Task<ActionResult<OrderDto>> GetById(
         Guid id,
         [FromQuery] OrderQueryParameters query)
@@ -100,9 +98,8 @@ public class OrdersController(
         return Ok(dto);
     }
 
-    [Authorize(Roles =
-        $"{Roles.Admin},{Roles.Sales}")]
     [HttpPost]
+    [HasPermission(Permissions.OrdersCreate)]
     public async Task<ActionResult<OrderDto>> Create(
         [FromBody] CreateOrderDto dto,
         [FromServices] IValidator<CreateOrderDto> validator)
@@ -133,9 +130,8 @@ public class OrdersController(
             orderDto);
     }
 
-    [Authorize(Roles =
-        $"{Roles.Admin},{Roles.Sales}")]
     [HttpPut("{id:guid}")]
+    [HasPermission(Permissions.OrdersUpdate)]
     public async Task<IActionResult> Update(
         Guid id,
         [FromBody] UpdateOrderDto dto,
@@ -168,9 +164,8 @@ public class OrdersController(
         return NoContent();
     }
 
-    [Authorize(Roles =
-        $"{Roles.Admin},{Roles.Warehouse}")]
     [HttpPatch("{id:guid}/status")]
+    [HasPermission(Permissions.OrdersUpdateStatus)]
     public async Task<IActionResult> UpdateStatus(
         Guid id,
         [FromBody] UpdateOrderStatusDto dto,
@@ -209,8 +204,8 @@ public class OrdersController(
         return NoContent();
     }
 
-    [Authorize(Roles = Roles.Admin)]
     [HttpDelete("{id:guid}")]
+    [HasPermission(Permissions.OrdersDelete)]
     public async Task<IActionResult> Delete(Guid id)
     {
         Guid? userId = await userContext.GetUserIdAsync();

@@ -5,7 +5,7 @@ using NexaERP.API.Services;
 using NexaERP.BLL.DTOs.Common;
 using NexaERP.BLL.DTOs.Customer;
 using NexaERP.BLL.Mappings;
-using NexaERP.DAL.Identity;
+using NexaERP.DAL.Authorization;
 using NexaERP.DAL.Repositories.Abstraction;
 namespace NexaERP.API.Controllers;
 
@@ -17,9 +17,8 @@ public class CustomersController(
     LinkService linkService,
     IUnitOfWork unitOfWork) : ControllerBase
 {
-    [Authorize(Roles =
-    $"{Roles.Admin},{Roles.Sales},{Roles.Accountant}")]
     [HttpGet]
+    [HasPermission(Permissions.CustomersRead)]
     public async Task<ActionResult<PaginationResult<CustomerDto>>> GetCustomers(
         [FromQuery] CustomerQueryParameters query)
     {
@@ -48,9 +47,8 @@ public class CustomersController(
         return Ok(result);
     }
 
-    [Authorize(Roles =
-        $"{Roles.Admin},{Roles.Sales},{Roles.Accountant}")]
     [HttpGet("{id:guid}")]
+    [HasPermission(Permissions.CustomersRead)]
     public async Task<ActionResult<CustomerDto>> GetById(
         Guid id,
         [FromQuery] CustomerQueryParameters query)
@@ -73,8 +71,7 @@ public class CustomersController(
 
     }
 
-    [Authorize(Roles =
-        $"{Roles.Admin},{Roles.Sales}")]
+    [HasPermission(Permissions.CustomersCreate)]
     [HttpPost]
     public async Task<ActionResult<CustomerDto>> Create(
        [FromBody] CreateCustomerDto dto,
@@ -96,9 +93,8 @@ public class CustomersController(
             customerDto);
     }
 
-    [Authorize(Roles =
-        $"{Roles.Admin},{Roles.Sales}")]
     [HttpPut("{id:guid}")]
+    [HasPermission(Permissions.CustomersUpdate)]
     public async Task<ActionResult<CustomerDto>> Update(
         Guid id,
         [FromBody] UpdateCustomerDto dto,
@@ -122,8 +118,8 @@ public class CustomersController(
         return NoContent();
     }
 
-    [Authorize(Roles = Roles.Admin)]
     [HttpDelete("{id:guid}")]
+    [HasPermission(Permissions.CustomersDelete)]
     public async Task<ActionResult> Delete(Guid id)
     {
         var customer = await customerRepository.GetByIdAsync(id);

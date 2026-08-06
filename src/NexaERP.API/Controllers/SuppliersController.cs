@@ -5,8 +5,8 @@ using NexaERP.API.Services;
 using NexaERP.BLL.DTOs.Common;
 using NexaERP.BLL.DTOs.Supplier;
 using NexaERP.BLL.Mappings;
+using NexaERP.DAL.Authorization;
 using NexaERP.DAL.Entities;
-using NexaERP.DAL.Identity;
 using NexaERP.DAL.Repositories.Abstraction;
 namespace NexaERP.API.Controllers;
 
@@ -18,9 +18,8 @@ public class SuppliersController(
     LinkService linkService,
     IUnitOfWork unitOfWork) : ControllerBase
 {
-    [Authorize(Roles =
-        $"{Roles.Admin},{Roles.Purchasing},{Roles.Accountant}")]
     [HttpGet]
+    [HasPermission(Permissions.SuppliersRead)]
     public async Task<ActionResult<PaginationResult<SupplierDto>>> GetSuppliers(
         [FromQuery] SupplierQueryParameters query)
     {
@@ -50,9 +49,8 @@ public class SuppliersController(
 
         return Ok(result);
     }
-    [Authorize(Roles =
-        $"{Roles.Admin},{Roles.Purchasing},{Roles.Accountant}")]
     [HttpGet("{id:guid}")]
+    [HasPermission(Permissions.SuppliersRead)]
     public async Task<ActionResult<SupplierDto>> GetById(
         Guid id,
          [FromQuery] SupplierQueryParameters query)
@@ -74,9 +72,8 @@ public class SuppliersController(
         return Ok(supplierDto);
     }
 
-    [Authorize(Roles =
-        $"{Roles.Admin},{Roles.Purchasing}")]
     [HttpPost]
+    [HasPermission(Permissions.SuppliersCreate)]
     public async Task<ActionResult<SupplierDto>> Create(
        [FromBody] CreateSupplierDto dto,
        [FromServices] IValidator<CreateSupplierDto> validator)
@@ -98,9 +95,8 @@ public class SuppliersController(
             supplierDto);
     }
 
-    [Authorize(Roles =
-        $"{Roles.Admin},{Roles.Purchasing}")]
     [HttpPut("{id:guid}")]
+    [HasPermission(Permissions.SuppliersUpdate)]
     public async Task<ActionResult> Update(
         Guid id,
         [FromBody] UpdateSupplierDto dto,
@@ -124,8 +120,8 @@ public class SuppliersController(
         return NoContent();
     }
 
-    [Authorize(Roles = Roles.Admin)]
     [HttpDelete("{id:guid}")]
+    [HasPermission(Permissions.SuppliersDelete)]
     public async Task<ActionResult> Delete(Guid id)
     {
         Supplier? supplier = await supplierRepository.GetByIdAsync(id);

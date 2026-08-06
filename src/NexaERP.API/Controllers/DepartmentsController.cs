@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NexaERP.BLL.DTOs.Department;
 using NexaERP.BLL.Mappings;
-using NexaERP.DAL.Identity;
+using NexaERP.DAL.Authorization;
 using NexaERP.DAL.Repositories.Abstraction;
 
 namespace NexaERP.API.Controllers;
@@ -16,8 +16,8 @@ public class DepartmentsController(
     IDepartmentRepository repository)
     : ControllerBase
 {
-    [Authorize(Roles = $"{Roles.Admin},{Roles.HR}")]
     [HttpGet]
+    [HasPermission(Permissions.DepartmentsRead)]
     public async Task<ActionResult<List<DepartmentDto>>> GetDepartments()
     {
         var departments = await repository
@@ -30,8 +30,8 @@ public class DepartmentsController(
         return Ok(departments);
     }
 
-    [Authorize(Roles = $"{Roles.Admin},{Roles.HR}")]
     [HttpGet("{id:guid}")]
+    [HasPermission(Permissions.DepartmentsRead)]
     public async Task<ActionResult<DepartmentDto>> GetById(Guid id)
     {
         var department = await repository.GetByIdAsync(id);
@@ -44,8 +44,8 @@ public class DepartmentsController(
         return Ok(department.ToDto());
     }
 
-    [Authorize(Roles = $"{Roles.Admin},{Roles.HR}")]
     [HttpPost]
+    [HasPermission(Permissions.DepartmentsCreate)]
     public async Task<ActionResult<DepartmentDto>> Create(
     [FromBody] CreateDepartmentDto dto,
     [FromServices] IValidator<CreateDepartmentDto> validator,
