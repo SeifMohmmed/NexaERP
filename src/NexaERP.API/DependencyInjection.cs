@@ -2,6 +2,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.OpenApi;
 using NexaERP.API.Middleware;
 using NexaERP.API.Services;
 using NexaERP.BLL.DTOs.Customer;
@@ -18,30 +19,30 @@ namespace NexaERP.API;
 
 public static class DependencyInjection
 {
+    // Registers API services.
     public static WebApplicationBuilder AddApiServices(
         this WebApplicationBuilder builder)
     {
-        // Enable dependency injection validation to catch
-        // invalid service registrations during startup.
+        // Enable dependency injection validation.
         builder.Host.UseDefaultServiceProvider((context, options) =>
         {
             options.ValidateScopes = true;
             options.ValidateOnBuild = true;
         });
 
-        // Register MVC controllers and configure content negotiation.
+        // Register controllers and configure content negotiation.
         builder.Services.AddControllers(options =>
         {
-            // Return HTTP 406 if the requested media type is not supported.
+            // Return HTTP 406 for unsupported media types.
             options.ReturnHttpNotAcceptable = true;
         })
-        // Serialize enums as strings instead of numbers.
+        // Serialize enums as strings.
         .AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.Converters
                 .Add(new JsonStringEnumConverter());
         })
-        // Support XML responses in addition to JSON.
+        // Enable XML responses.
         .AddXmlSerializerFormatters();
 
         builder.Services.Configure<MvcOptions>(options =>
@@ -73,59 +74,90 @@ public static class DependencyInjection
             };
         });
 
+        // Register exception handlers.
         builder.Services.AddExceptionHandler<ValidationExceptionHandler>();
         builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
-        // Register OpenAPI/Swagger document generation.
+        // Register OpenAPI.
         builder.Services.AddOpenApi();
 
         // Register HttpContext accessor.
         builder.Services.AddHttpContextAccessor();
 
-        // Register Services.
+        // Register application services.
         builder.Services.AddTransient<LinkService>();
         builder.Services.AddTransient<InvoicePdfService>();
         builder.Services.AddTransient<TokenProvider>();
 
+        // Register business services.
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<IRoleService, RoleService>();
 
+        // Configure Swagger.
+        AddSwaggerDocumentation(builder.Services);
+
+        // Configure OpenTelemetry.
+        builder.AddObservability();
+
         return builder;
     }
+
+    // Configures OpenTelemetry.
     public static WebApplicationBuilder AddObservability(
         this WebApplicationBuilder builder)
     {
         builder.Services.AddOpenTelemetry()
-                    .ConfigureResource(resource =>
-                        // Register service name in telemetry system
-                        resource.AddService(builder.Environment.ApplicationName))
-                    .WithTracing(tracing => tracing
-                        // Trace outgoing HTTP calls
-                        .AddHttpClientInstrumentation()
-                        // Trace incoming ASP.NET Core requests
-                        .AddAspNetCoreInstrumentation()
-                        // Trace PostgreSQL queries
-                        .AddNpgsql())
-                    .WithMetrics(metrics => metrics
-                        // Metrics for outgoing HTTP
-                        .AddHttpClientInstrumentation()
-                        // Metrics for incoming HTTP
-                        .AddAspNetCoreInstrumentation()
-                        // Runtime metrics (GC, CPU, etc.)
-                        .AddRuntimeInstrumentation())
-                    // Export telemetry using OTLP (e.g., to Jaeger, Grafana, etc.)
-                    .UseOtlpExporter();
 
-        // Adds OpenTelemetry logging to capture structured logs
+            // Register the application as a telemetry resource.
+            .ConfigureResource(resource =>
+                resource.AddService(builder.Environment.ApplicationName))
+
+            // Configure distributed tracing.
+            .WithTracing(tracing => tracing
+                .AddHttpClientInstrumentation()   // Outgoing requests
+                .AddAspNetCoreInstrumentation()   // Incoming requests
+                .AddNpgsql())                     // PostgreSQL queries
+
+            // Configure metrics collection.
+            .WithMetrics(metrics => metrics
+                .AddHttpClientInstrumentation()
+                .AddAspNetCoreInstrumentation()
+                .AddRuntimeInstrumentation())
+
+            // Export telemetry via OTLP.
+            .UseOtlpExporter();
+
+        // Enable OpenTelemetry logging.
         builder.Logging.AddOpenTelemetry(options =>
         {
-            // Includes logging scopes (useful for request tracing and correlation IDs)
+            // Include logging scopes.
             options.IncludeScopes = true;
 
-            // Includes the fully formatted log message instead of only template + parameters
+            // Include formatted log messages.
             options.IncludeFormattedMessage = true;
         });
 
         return builder;
+    }
+
+    // Configures Swagger/OpenAPI.
+    internal static IServiceCollection AddSwaggerDocumentation(
+        this IServiceCollection services)
+    {
+        services.AddSwaggerGen(options =>
+        {
+            // Configure the OpenAPI document.
+            options.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "NexaERP API",
+                Version = "v1",
+            });
+
+            // Prevent schema name conflicts.
+            options.CustomSchemaIds(
+                t => t.FullName?.Replace("+", "."));
+        });
+
+        return services;
     }
 }

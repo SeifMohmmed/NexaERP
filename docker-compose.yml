@@ -29,3 +29,10 @@ services:
       DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: true
     ports:
       - 18888:18888
+
+  nexaerp.redis:
+    image: redis:latest
+    container_name: NexaERP.Redis
+    restart: always
+    ports:
+      - "6379:6379"

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using NexaERP.BLL.DTOs.Common;
 using NexaERP.BLL.DTOs.Roles;
 using NexaERP.BLL.Services.Abstraction;
+using NexaERP.DAL.Caching;
 using NexaERP.DAL.Entities;
 using NexaERP.DAL.Repositories.Abstraction;
 
@@ -11,19 +12,38 @@ namespace NexaERP.BLL.Services.Implementation;
 public sealed class RoleService(
     RoleManager<IdentityRole> roleManager,
     UserManager<IdentityUser> userManager,
+    CacheService cacheService,
     IUserRepository userRepository)
     : IRoleService
 {
     // Returns all available roles.
     public async Task<IReadOnlyCollection<RoleDto>> GetRolesAsync()
     {
-        return await roleManager.Roles
-            .AsNoTracking()
-            .Select(role => new RoleDto
-            {
-                Name = role.Name!
-            })
-            .ToListAsync();
+        const string cacheKey = "roles:all";
+
+        IReadOnlyCollection<RoleDto>? cachedRoles =
+            await cacheService.GetAsync<IReadOnlyCollection<RoleDto>>(cacheKey);
+
+        if (cachedRoles is not null)
+        {
+            return cachedRoles;
+        }
+
+        IReadOnlyCollection<RoleDto> roles =
+            await roleManager.Roles
+                .AsNoTracking()
+                .Select(role => new RoleDto
+                {
+                    Name = role.Name!
+                })
+                .ToListAsync();
+
+        await cacheService.SetAsync(
+            cacheKey,
+            roles,
+            TimeSpan.FromMinutes(30));
+
+        return roles;
     }
 
     // Assigns a role to a user.
@@ -69,14 +89,12 @@ public sealed class RoleService(
         // Return Identity errors if the operation fails.
         if (!result.Succeeded)
         {
-            return new Result
-            {
-                Succeeded = false,
-                Errors = result.Errors.ToDictionary(
-                    e => e.Code,
-                    e => e.Description)
-            };
+            return CreateFailedResult(result);
         }
+
+        // Invalidate cached permissions.
+        await cacheService.RemoveAsync(
+            $"auth:permissions:{identityUser.Id}");
 
         return new Result
         {
@@ -160,14 +178,13 @@ public sealed class RoleService(
         // Return Identity errors if the operation fails.
         if (!result.Succeeded)
         {
-            return new Result
-            {
-                Succeeded = false,
-                Errors = result.Errors.ToDictionary(
-                    e => e.Code,
-                    e => e.Description)
-            };
+            return CreateFailedResult(result);
+
         }
+
+        // Invalidate cached permissions.
+        await cacheService.RemoveAsync(
+            $"auth:permissions:{identityUser.Id}");
 
         return new Result
         {
@@ -245,6 +262,10 @@ public sealed class RoleService(
         {
             return CreateFailedResult(addResult);
         }
+
+        // Invalidate cached permissions.
+        await cacheService.RemoveAsync(
+            $"auth:permissions:{identityUser.Id}");
 
         return new Result
         {
