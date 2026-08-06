@@ -69,6 +69,7 @@ public static class DependencyInjection
         AddCaching(services, configuration);
         AddDatabase(services, configuration);
         AddAuthenticationService(services, configuration);
+        AddHealthChecks(services, configuration);
 
         return services;
     }
@@ -188,5 +189,25 @@ public static class DependencyInjection
 
         // Register cache service.
         services.AddSingleton<CacheService>();
+    }
+
+    /// <summary>
+    /// Registers health checks for external dependencies.
+    /// </summary>
+    private static void AddHealthChecks(
+        IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.AddHealthChecks()
+
+            // PostgreSQL
+            .AddNpgSql(
+                configuration.GetConnectionString("Database")!,
+                name: "postgres")
+
+            // Redis
+            .AddRedis(
+                configuration.GetConnectionString("Cache")!,
+                name: "redis");
     }
 }

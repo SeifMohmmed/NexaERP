@@ -1,3 +1,5 @@
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using NexaERP.API;
 using NexaERP.DAL;
 using NexaERP.DAL.Extensions;
@@ -31,6 +33,14 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseRateLimiter();
+
+app.MapHealthChecks(
+    "/health",
+    new HealthCheckOptions
+    {
+        ResponseWriter =
+            UIResponseWriter.WriteHealthCheckUIResponse
+    });
 
 app.MapControllers();
 
