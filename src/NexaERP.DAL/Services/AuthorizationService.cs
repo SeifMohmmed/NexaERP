@@ -1,10 +1,12 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
+using NexaERP.DAL.Caching;
 using NexaERP.DAL.Identity;
 
 namespace NexaERP.DAL.Services;
 
 public sealed class AuthorizationService(
+    CacheService cacheService,
     UserManager<IdentityUser> userManager,
     RoleManager<IdentityRole> roleManager)
 {
@@ -12,6 +14,19 @@ public sealed class AuthorizationService(
     public async Task<HashSet<string>> GetPermissionsForUserAsync(
         string identityId)
     {
+        // Cache key for the user's permissions.
+        string cacheKey = $"auth:permissions:{identityId}";
+
+        // Try to load permissions from the cache.
+        var cachedPermissions =
+            await cacheService.GetAsync<HashSet<string>>(cacheKey);
+
+        // Return cached permissions if available.
+        if (cachedPermissions is not null)
+        {
+            return cachedPermissions;
+        }
+
         // Find the Identity user.
         IdentityUser? user =
             await userManager.FindByIdAsync(identityId);
@@ -48,6 +63,12 @@ public sealed class AuthorizationService(
                     .Where(c => c.Type == JwtCustomClaimNames.Permission)
                     .Select(c => c.Value));
         }
+
+        // Cache the resolved permissions.
+        await cacheService.SetAsync(
+            cacheKey,
+            permissions,
+            TimeSpan.FromMinutes(15));
 
         return permissions;
     }

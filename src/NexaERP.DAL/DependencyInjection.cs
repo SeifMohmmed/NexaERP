@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using NexaERP.DAL.Caching;
 using NexaERP.DAL.Context;
 using NexaERP.DAL.Database;
 using NexaERP.DAL.Identity;
@@ -22,7 +23,8 @@ public static class DependencyInjection
 {
     // Registers repositories and infrastructure services.
     public static IServiceCollection AddInfrastructure(
-        this IServiceCollection services)
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
         // Register generic repository.
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -55,8 +57,18 @@ public static class DependencyInjection
             IAuthorizationHandler,
             PermissionAuthorizationHandler>();
 
+        // Register dynamic permission policy provider.
+        services.AddSingleton<
+            IAuthorizationPolicyProvider,
+            PermissionAuthorizationPolicyProvider>();
+
         // Register authorization service.
         services.AddScoped<AuthorizationService>();
+
+        // Register infrastructure services.
+        AddCaching(services, configuration);
+        AddDatabase(services, configuration);
+        AddAuthenticationService(services, configuration);
 
         return services;
     }
@@ -158,5 +170,23 @@ public static class DependencyInjection
         services.AddAuthorization();
 
         return services;
+    }
+
+    // Registers distributed caching services.
+    private static void AddCaching(
+        IServiceCollection services,
+        IConfiguration configuration)
+    {
+        // Get the Redis connection string.
+        var connectionString =
+            configuration.GetConnectionString("Cache")
+            ?? throw new ArgumentNullException(nameof(configuration));
+
+        // Register Redis distributed cache.
+        services.AddStackExchangeRedisCache(options =>
+            options.Configuration = connectionString);
+
+        // Register cache service.
+        services.AddSingleton<CacheService>();
     }
 }
