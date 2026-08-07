@@ -53,5 +53,9 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             .WithMany()
             .HasForeignKey(p => p.CategoryId)
             .OnDelete(DeleteBehavior.Restrict); // Prevents deleting a category that is referenced by products.
+
+        // Configure the row version for optimistic concurrency.
+        builder.Property<uint>("Version")
+            .IsRowVersion();
     }
 }

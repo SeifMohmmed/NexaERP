@@ -1,5 +1,6 @@
-﻿using FluentValidation;
-using Microsoft.AspNetCore.Diagnostics;
+﻿using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace NexaERP.API.Middleware;
 
@@ -9,40 +10,38 @@ namespace NexaERP.API.Middleware;
 public sealed class ValidationExceptionHandler(
     IProblemDetailsService problemDetailsService) : IExceptionHandler
 {
-    public async ValueTask<bool> TryHandleAsync(
+    public ValueTask<bool> TryHandleAsync(
         HttpContext httpContext,
         Exception exception,
         CancellationToken cancellationToken)
     {
-        // Ignore non-validation exceptions.
-        if (exception is not ValidationException validationException)
+        // Handle optimistic concurrency conflicts.
+        if (exception is DbUpdateConcurrencyException)
         {
-            return false;
+            return problemDetailsService.TryWriteAsync(new ProblemDetailsContext
+            {
+                HttpContext = httpContext,
+                Exception = exception,
+                ProblemDetails = new ProblemDetails
+                {
+                    Status = StatusCodes.Status409Conflict,
+                    Title = "Concurrency Conflict",
+                    Detail = "The resource was modified by another user. Please reload the resource and try again."
+                }
+            });
         }
 
-        httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-
-        // Create Problem Details response.
-        var context = new ProblemDetailsContext()
+        // Return a generic 500 Problem Details response.
+        return problemDetailsService.TryWriteAsync(new ProblemDetailsContext
         {
             HttpContext = httpContext,
             Exception = exception,
-            ProblemDetails = new()
+            ProblemDetails = new ProblemDetails
             {
-                Detail = "One or more validation error occured",
-                Status = StatusCodes.Status400BadRequest,
+                Status = StatusCodes.Status500InternalServerError,
+                Title = "Internal Server Error",
+                Detail = "An error occurred while processing your request. Please try again."
             }
-        };
-
-        // Group validation errors by property.
-        var errors = validationException.Errors
-             .GroupBy(x => x.PropertyName)
-             .ToDictionary(
-                 g => g.Key.ToLower(),
-                 g => g.Select(e => e.ErrorMessage).ToArray());
-
-        context.ProblemDetails.Extensions.Add("errors", errors);
-
-        return await problemDetailsService.TryWriteAsync(context);
+        });
     }
 }

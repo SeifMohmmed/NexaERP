@@ -44,5 +44,9 @@ internal sealed class InvoiceConfiguration
         builder.HasQueryFilter(i =>
             !i.IsDeleted &&
             !i.Customer.IsDeleted);
+
+        // Configure the row version for optimistic concurrency.
+        builder.Property<uint>("Version")
+            .IsRowVersion();
     }
 }

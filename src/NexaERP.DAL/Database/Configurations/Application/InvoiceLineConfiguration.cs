@@ -38,5 +38,9 @@ internal sealed class InvoiceLineConfiguration
             !i.IsDeleted &&
             !i.Invoice.IsDeleted &&
             !i.Invoice.Customer.IsDeleted);
+
+        // Configure the row version for optimistic concurrency.
+        builder.Property<uint>("Version")
+            .IsRowVersion();
     }
 }

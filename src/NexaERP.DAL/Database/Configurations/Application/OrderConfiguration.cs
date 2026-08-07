@@ -67,5 +67,9 @@ internal sealed class OrderConfiguration
         builder.HasQueryFilter(o =>
             !o.IsDeleted &&
             !o.Customer.IsDeleted);
+
+        // Configure the row version for optimistic concurrency.
+        builder.Property<uint>("Version")
+            .IsRowVersion();
     }
 }

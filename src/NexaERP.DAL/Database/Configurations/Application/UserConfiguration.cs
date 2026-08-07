@@ -40,5 +40,9 @@ internal sealed class UserConfiguration
 
         builder.HasIndex(u => u.IdentityId)
             .IsUnique();
+
+        // Configure the row version for optimistic concurrency.
+        builder.Property<uint>("Version")
+            .IsRowVersion();
     }
 }

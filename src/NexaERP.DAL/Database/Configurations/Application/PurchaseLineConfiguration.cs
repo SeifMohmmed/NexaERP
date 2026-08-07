@@ -43,5 +43,9 @@ internal sealed class PurchaseLineConfiguration
             .WithMany()
             .HasForeignKey(pl => pl.ProductId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        // Configure the row version for optimistic concurrency.
+        builder.Property<uint>("Version")
+            .IsRowVersion();
     }
 }
