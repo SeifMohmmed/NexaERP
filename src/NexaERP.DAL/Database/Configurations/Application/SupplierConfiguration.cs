@@ -38,5 +38,9 @@ internal sealed class SupplierConfiguration : IEntityTypeConfiguration<Supplier>
         // Enforce unique email addresses
         builder.HasIndex(s => s.Email)
             .IsUnique();
+
+        // Configure the row version for optimistic concurrency.
+        builder.Property<uint>("Version")
+            .IsRowVersion();
     }
 }

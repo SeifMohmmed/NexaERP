@@ -26,5 +26,9 @@ internal sealed class CategoryConfiguration : IEntityTypeConfiguration<Category>
         // Optional description with a maximum length.
         builder.Property(c => c.Description)
             .HasMaxLength(500);
+
+        // Configure the row version for optimistic concurrency.
+        builder.Property<uint>("Version")
+            .IsRowVersion();
     }
 }

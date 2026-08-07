@@ -71,5 +71,9 @@ internal sealed class OrderLineConfiguration
             !ol.IsDeleted &&
             !ol.Order.IsDeleted &&
             !ol.Order.Customer.IsDeleted);
+
+        // Configure the row version for optimistic concurrency.
+        builder.Property<uint>("Version")
+            .IsRowVersion();
     }
 }

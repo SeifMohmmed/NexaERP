@@ -19,5 +19,9 @@ internal sealed class DepartmentConfiguration
 
         builder.HasIndex(d => d.Name)
             .IsUnique();
+
+        // Configure the row version for optimistic concurrency.
+        builder.Property<uint>("Version")
+            .IsRowVersion();
     }
 }

@@ -57,5 +57,9 @@ internal sealed class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 
         // Exclude soft-deleted customers from queries
         builder.HasQueryFilter(c => !c.IsDeleted);
+
+        // Configure the row version for optimistic concurrency.
+        builder.Property<uint>("Version")
+            .IsRowVersion();
     }
 }
