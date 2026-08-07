@@ -41,7 +41,6 @@ internal sealed class ProductRepository : GenericRepository<Product>, IProductRe
     public async Task<Product?> GetByIdAsync(Guid id)
     {
         return await _dbSet
-            .AsNoTracking()
             .Include(p => p.Category)
             .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
     }
