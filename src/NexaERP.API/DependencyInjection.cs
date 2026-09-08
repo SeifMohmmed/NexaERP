@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.OpenApi;
 using NexaERP.API.Middleware;
 using NexaERP.API.Services;
+using NexaERP.API.Settings;
 using NexaERP.BLL.DTOs.Customer;
 using NexaERP.BLL.Services;
 using NexaERP.BLL.Services.Abstraction;
@@ -99,6 +100,9 @@ public static class DependencyInjection
         // Configure Swagger.
         AddSwaggerDocumentation(builder.Services);
 
+        //Configure CORS policy.
+        AddCorsPolicy(builder.Services, builder.Configuration);
+
         // Configure OpenTelemetry.
         builder.AddObservability();
 
@@ -106,6 +110,31 @@ public static class DependencyInjection
         builder.AddRateLimiting();
 
         return builder;
+    }
+
+    // Configures CORS policy.
+    public static IServiceCollection AddCorsPolicy(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        // Load CORS settings from configuration
+        CorsOptions corsOptions = configuration
+            .GetSection(CorsOptions.SectionName)
+            .Get<CorsOptions>()!;
+
+        services.AddCors(options =>
+        {
+            options.AddPolicy(CorsOptions.PolicyName, policy =>
+            {
+                // Allow configured origins
+                policy
+                    .WithOrigins(corsOptions.AllowedOrigins)
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            });
+        });
+
+        return services;
     }
 
     // Configures OpenTelemetry.

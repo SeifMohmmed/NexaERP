@@ -256,4 +256,26 @@ public sealed class AuthService(
             Token = accessToken
         };
     }
+    //Logout method to invalidate the refresh token and end the user's session.
+    public async Task<AuthenticationResult> LogoutAsync(string refreshToken)
+    {
+        // Find the refresh token in the database
+        var token = await refreshTokenRepository.GetByTokenAsync(refreshToken);
+
+        // If the refresh token exists, remove it to invalidate the session
+        if (token is not null)
+        {
+            // Mark the refresh token for deletion
+            refreshTokenRepository.Delete(token);
+
+            // Persist the deletion to the database
+            await identityDbContext.SaveChangesAsync();
+        }
+
+        // Return a successful result regardless of whether the token existed
+        return new AuthenticationResult
+        {
+            Succeeded = true
+        };
+    }
 }

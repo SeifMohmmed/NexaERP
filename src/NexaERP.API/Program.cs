@@ -1,6 +1,7 @@
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using NexaERP.API;
+using NexaERP.API.Settings;
 using NexaERP.DAL;
 using NexaERP.DAL.Extensions;
 
@@ -25,6 +26,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(CorsOptions.PolicyName);
 
 app.UseExceptionHandler();
 
