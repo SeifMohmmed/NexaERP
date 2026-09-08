@@ -10,12 +10,12 @@ namespace NexaERP.API.Controllers;
 
 [Route("auth")]
 [ApiController]
-[AllowAnonymous]
 public sealed class AuthController(
     IAuthService authService)
     : ControllerBase
 {
     [HttpPost("register")]
+    [AllowAnonymous]
     [EnableRateLimiting(RateLimitingPolicies.Auth)]
     public async Task<ActionResult<AccessTokenDto>> Register(
         RegisterUserDto dto,
@@ -40,6 +40,7 @@ public sealed class AuthController(
     }
 
     [HttpPost("login")]
+    [AllowAnonymous]
     [EnableRateLimiting(RateLimitingPolicies.Auth)]
     public async Task<ActionResult<AccessTokenDto>> Login(
         [FromBody] LoginUserDto dto,
@@ -64,6 +65,7 @@ public sealed class AuthController(
     }
 
     [HttpPost("refresh")]
+    [AllowAnonymous]
     [EnableRateLimiting(RateLimitingPolicies.Auth)]
     public async Task<ActionResult<AccessTokenDto>> Refresh(
     [FromBody] RefreshTokenDto dto,
@@ -86,5 +88,28 @@ public sealed class AuthController(
         }
 
         return Ok(result.Token);
+    }
+
+    [HttpPost("logout")]
+    [Authorize]
+    [EnableRateLimiting(RateLimitingPolicies.Auth)]
+    public async Task<IActionResult> Logout(
+    [FromBody] RefreshTokenDto dto)
+    {
+        AuthenticationResult result =
+            await authService.LogoutAsync(dto.RefreshToken);
+
+        if (!result.Succeeded)
+        {
+            return Problem(
+                detail: "Unable to logout.",
+                statusCode: StatusCodes.Status400BadRequest,
+                extensions: new Dictionary<string, object?>
+                {
+                    ["errors"] = result.Errors
+                });
+        }
+
+        return NoContent();
     }
 }

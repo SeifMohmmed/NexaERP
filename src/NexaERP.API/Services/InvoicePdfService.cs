@@ -1,7 +1,6 @@
 ﻿using System.Globalization;
 using NexaERP.BLL.DTOs.Invoice;
 using NexaERP.DAL.Enums;
-using QuestPDF;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -18,7 +17,7 @@ public sealed class InvoicePdfService
     public MemoryStream Generate(InvoiceDto invoice)
     {
         // Use the QuestPDF Community license.
-        Settings.License = LicenseType.Community;
+        QuestPDF.Settings.License = LicenseType.Community;
 
         var stream = new MemoryStream();
 
