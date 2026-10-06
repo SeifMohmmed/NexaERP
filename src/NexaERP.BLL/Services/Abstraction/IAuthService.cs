@@ -10,5 +10,7 @@ public interface IAuthService
 
     Task<AuthenticationResult> RefreshAsync(RefreshTokenDto dto);
 
-    Task<AuthenticationResult> LogoutAsync(string refreshToken);
+    Task<AuthenticationResult> LogoutAsync(string refreshToken,  string userId);
+    
+    Task<CurrentUserDto?> GetCurrentUserAsync();
 }

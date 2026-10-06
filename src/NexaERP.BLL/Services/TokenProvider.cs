@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.Globalization;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Options;
@@ -51,7 +52,15 @@ public sealed class TokenProvider(IOptions<JwtAuthOptions> options)
 
             // User email
             new (JwtRegisteredClaimNames.Email, tokenRequest.Email),
-
+           
+            // Token issued-at timestamp
+            new(
+            JwtRegisteredClaimNames.Iat,
+            DateTimeOffset.UtcNow
+                .ToUnixTimeSeconds()
+                .ToString(CultureInfo.InvariantCulture),
+            ClaimValueTypes.Integer64),
+            
             // Add a role claim for each user role
             ..tokenRequest.Roles.Select(role=>
             new Claim(JwtCustomClaimNames.Role,role))
@@ -96,4 +105,11 @@ public sealed class TokenProvider(IOptions<JwtAuthOptions> options)
         return Convert.ToBase64String(randomBytes);
     }
 
+    public static string HashRefreshToken(string refreshToken)
+    {
+        byte[] hash = SHA256.HashData(
+            Encoding.UTF8.GetBytes(refreshToken));
+
+        return Convert.ToHexString(hash);
+    }
 }
