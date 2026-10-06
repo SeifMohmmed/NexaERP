@@ -9,25 +9,34 @@ internal sealed class RefreshTokenConfiguration
 {
     public void Configure(EntityTypeBuilder<RefreshToken> builder)
     {
-        builder.HasKey(e => e.Id);
+        builder.ToTable("refresh_tokens");
 
-        builder.Property(e => e.UserId)
-            .HasMaxLength(300)
+        builder.HasKey(x => x.Id);
+
+        builder.Property(x => x.UserId)
             .IsRequired();
 
-        builder.Property(e => e.Token)
-            .HasMaxLength(1000)
+        builder.Property(x => x.TokenHash)
+            .IsRequired()
+            .HasMaxLength(128);
+
+        builder.Property(x => x.FamilyId)
             .IsRequired();
 
-        builder.Property(e => e.ExpireAtUtc)
+        builder.Property(x => x.ExpiresAtUtc)
             .IsRequired();
 
-        builder.HasIndex(e => e.Token)
+        builder.Property(x => x.RevokedAtUtc)
+            .IsRequired(false);
+
+        builder.HasOne(x => x.User)
+            .WithMany()
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(x => x.TokenHash)
             .IsUnique();
 
-        builder.HasOne(e => e.User)
-            .WithMany()
-            .HasForeignKey(e => e.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+        builder.HasIndex(x => x.FamilyId);
     }
 }

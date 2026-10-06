@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
@@ -21,7 +23,8 @@ public sealed class AuthService(
     TokenProvider tokenProvider,
     ApplicationDbContext appDbContext,
     ApplicationIdentityDbContext identityDbContext,
-    IOptions<JwtAuthOptions> options)
+    IOptions<JwtAuthOptions> options,
+    IHttpContextAccessor httpContextAccessor)
     : IAuthService
 {
     // JWT authentication settings.
@@ -112,8 +115,10 @@ public sealed class AuthService(
         {
             Id = Guid.CreateVersion7(),
             UserId = identityUser.Id,
-            Token = accessToken.RefreshToken,
-            ExpireAtUtc = DateTime.UtcNow.AddDays(
+            TokenHash = TokenProvider.HashRefreshToken(
+                accessToken.RefreshToken),
+            FamilyId = Guid.CreateVersion7(),
+            ExpiresAtUtc = DateTime.UtcNow.AddDays(
                 _jwtAuthOptions.RefreshTokenExiprationDays),
         };
 
@@ -174,8 +179,10 @@ public sealed class AuthService(
         {
             Id = Guid.CreateVersion7(),
             UserId = identityUser.Id,
-            Token = accessToken.RefreshToken,
-            ExpireAtUtc = DateTime.UtcNow.AddDays(
+            TokenHash = TokenProvider.HashRefreshToken(
+                accessToken.RefreshToken),
+            FamilyId = Guid.CreateVersion7(),
+            ExpiresAtUtc = DateTime.UtcNow.AddDays(
                 _jwtAuthOptions.RefreshTokenExiprationDays)
         };
 
@@ -195,10 +202,13 @@ public sealed class AuthService(
     public async Task<AuthenticationResult> RefreshAsync(
         RefreshTokenDto dto)
     {
-        // Find the refresh token.
+        // Hash the refresh token received from the client.
+        string tokenHash =
+            TokenProvider.HashRefreshToken(dto.RefreshToken);
+        
+        // Find the refresh token using its hash.
         RefreshToken? refreshToken =
-            await refreshTokenRepository.GetByTokenAsync(
-                dto.RefreshToken);
+            await refreshTokenRepository.GetByTokenHashAsync(tokenHash);
 
         // Validate the refresh token.
         if (refreshToken is null)
@@ -215,7 +225,7 @@ public sealed class AuthService(
         }
 
         // Check whether the refresh token has expired.
-        if (refreshToken.ExpireAtUtc <= DateTime.UtcNow)
+        if (refreshToken.ExpiresAtUtc <= DateTime.UtcNow)
         {
             return new AuthenticationResult
             {
@@ -227,7 +237,27 @@ public sealed class AuthService(
                 }
             };
         }
+        
+        // Reject an already revoked refresh token.
+        if (refreshToken.RevokedAtUtc is not null)
+        {
+            // The refresh token was already used or revoked.
+            // Treat this as a possible token reuse attack.
+            await refreshTokenRepository.RevokeFamilyAsync(
+                refreshToken.FamilyId);
 
+            return new AuthenticationResult
+            {
+                Succeeded = false,
+                Errors = new Dictionary<string, string>
+                {
+                    ["RefreshTokenReuseDetected"] =
+                        "Refresh token reuse detected."
+                }
+            };
+        }
+        
+        // Get the user's roles.
         IList<string> roles =
              await userManager.GetRolesAsync(refreshToken.User);
 
@@ -240,13 +270,25 @@ public sealed class AuthService(
         AccessTokenDto accessToken =
             tokenProvider.Create(tokenRequest);
 
-        // Rotate the refresh token.
-        refreshToken.Token = accessToken.RefreshToken;
-        refreshToken.ExpireAtUtc = DateTime.UtcNow.AddDays(
-            _jwtAuthOptions.RefreshTokenExiprationDays);
-
+        // Revoke the old refresh token.
+        refreshToken.RevokedAtUtc = DateTime.UtcNow;
+        
         refreshTokenRepository.Update(refreshToken);
 
+        // Create a new refresh token in the same token family.
+        var newRefreshToken = new RefreshToken
+        {
+            Id = Guid.CreateVersion7(),
+            UserId = refreshToken.UserId,
+            TokenHash = TokenProvider.HashRefreshToken(
+                accessToken.RefreshToken),
+            FamilyId = refreshToken.FamilyId,
+            ExpiresAtUtc = DateTime.UtcNow.AddDays(
+                _jwtAuthOptions.RefreshTokenExiprationDays)
+        };
+    
+        await refreshTokenRepository.AddAsync(newRefreshToken);
+        
         await identityDbContext.SaveChangesAsync();
 
         // Return the new tokens.
@@ -257,25 +299,81 @@ public sealed class AuthService(
         };
     }
     //Logout method to invalidate the refresh token and end the user's session.
-    public async Task<AuthenticationResult> LogoutAsync(string refreshToken)
+   public async Task<AuthenticationResult> LogoutAsync(
+        string refreshToken,
+        string userId)
     {
-        // Find the refresh token in the database
-        var token = await refreshTokenRepository.GetByTokenAsync(refreshToken);
+        // Hash the refresh token received from the client.
+        string tokenHash =
+            TokenProvider.HashRefreshToken(refreshToken);
 
-        // If the refresh token exists, remove it to invalidate the session
-        if (token is not null)
+        // Find the refresh token using its hash.
+        var token =
+            await refreshTokenRepository.GetByTokenHashAsync(tokenHash);
+
+        // If the token does not exist, logout is still considered successful.
+        if (token is null)
         {
-            // Mark the refresh token for deletion
-            refreshTokenRepository.Delete(token);
-
-            // Persist the deletion to the database
-            await identityDbContext.SaveChangesAsync();
+            return new AuthenticationResult
+            {
+                Succeeded = true
+            };
         }
 
-        // Return a successful result regardless of whether the token existed
+        if (token.UserId != userId)
+        {
+            return new AuthenticationResult
+            {
+                Succeeded = false,
+                Errors = new Dictionary<string, string>
+                {
+                    ["InvalidRefreshToken"] =
+                        "Refresh token does not belong to the current user."
+                }
+            };
+        }
+        
+        // Revoke the refresh token.
+        token.RevokedAtUtc = DateTime.UtcNow;
+
+        refreshTokenRepository.Update(token);
+
+        // Persist the revocation.
+        await identityDbContext.SaveChangesAsync();
+
         return new AuthenticationResult
         {
             Succeeded = true
+        };
+    }
+
+    public async Task<CurrentUserDto?> GetCurrentUserAsync()
+    {
+        string? identityId =
+            httpContextAccessor.HttpContext?.User.FindFirst(
+                JwtRegisteredClaimNames.Sub)?.Value;
+
+        if (identityId is null)
+        {
+            return null;
+        }
+
+        IdentityUser? user =
+            await userManager.FindByIdAsync(identityId);
+
+        if (user is null)
+        {
+            return null;
+        }
+
+        IList<string> roles =
+            await userManager.GetRolesAsync(user);
+
+        return new CurrentUserDto
+        {
+            Id = user.Id,
+            Email = user.Email!,
+            Roles = roles
         };
     }
 }

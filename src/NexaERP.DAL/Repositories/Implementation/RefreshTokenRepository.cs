@@ -15,13 +15,26 @@ internal sealed class RefreshTokenRepository(
     }
 
     // Returns a refresh token by its token value.
-    public async Task<RefreshToken?> GetByTokenAsync(string token)
+    public async Task<RefreshToken?> GetByTokenHashAsync(
+        string tokenHash)
     {
         return await context.RefreshTokens
             .Include(x => x.User)
-            .FirstOrDefaultAsync(x => x.Token == token);
+            .FirstOrDefaultAsync(x => x.TokenHash == tokenHash);
     }
-
+    
+    public async Task RevokeFamilyAsync(Guid familyId)
+    {
+        await context.RefreshTokens
+            .Where(x =>
+                x.FamilyId == familyId &&
+                x.RevokedAtUtc == null)
+            .ExecuteUpdateAsync(setters =>
+                setters.SetProperty(
+                    x => x.RevokedAtUtc,
+                    DateTime.UtcNow));
+    }
+    
     // Updates an existing refresh token.
     public void Update(RefreshToken refreshToken)
     {

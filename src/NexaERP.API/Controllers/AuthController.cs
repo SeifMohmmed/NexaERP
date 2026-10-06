@@ -12,7 +12,8 @@ namespace NexaERP.API.Controllers;
 [Route("auth")]
 [ApiController]
 public sealed class AuthController(
-    IAuthService authService)
+    IAuthService authService,
+    UserContext userContext)
     : ControllerBase
 {
     [HttpPost("register")]
@@ -93,12 +94,20 @@ public sealed class AuthController(
 
     [HttpPost("logout")]
     [Authorize]
-    //[EnableRateLimiting(RateLimitingPolicies.Auth)]
     public async Task<IActionResult> Logout(
-    [FromBody] RefreshTokenDto dto)
+        [FromBody] RefreshTokenDto dto)
     {
+        string? identityId = userContext.GetIdentityId();
+
+        if (identityId is null)
+        {
+            return Unauthorized();
+        }
+
         AuthenticationResult result =
-            await authService.LogoutAsync(dto.RefreshToken);
+            await authService.LogoutAsync(
+                dto.RefreshToken,
+                identityId);
 
         if (!result.Succeeded)
         {
@@ -131,5 +140,19 @@ public sealed class AuthController(
                 identityId);
 
         return Ok(permissions);
+    }
+    
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<ActionResult<CurrentUserDto>> GetCurrentUser()
+    {
+        CurrentUserDto? user = await authService.GetCurrentUserAsync();
+
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        return Ok(user);
     }
 }
