@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NexaERP.DAL.Database;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace NexaERP.DAL.Database.Migrations.Application
+namespace NexaERP.DAL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261003160424_Add Project, Task Tables")]
+    partial class AddProjectTaskTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -848,47 +851,6 @@ namespace NexaERP.DAL.Database.Migrations.Application
                     b.ToTable("Suppliers", "nexa_erp");
                 });
 
-            modelBuilder.Entity("NexaERP.DAL.Entities.TaskComment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<Guid>("AuthorId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("author_id");
-
-                    b.Property<string>("Body")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)")
-                        .HasColumnName("body");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<Guid>("TaskId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("task_id");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.HasKey("Id")
-                        .HasName("pk_task_comments");
-
-                    b.HasIndex("AuthorId")
-                        .HasDatabaseName("ix_task_comments_author_id");
-
-                    b.HasIndex("TaskId")
-                        .HasDatabaseName("ix_task_comments_task_id");
-
-                    b.ToTable("TaskComments", "nexa_erp");
-                });
-
             modelBuilder.Entity("NexaERP.DAL.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1116,27 +1078,6 @@ namespace NexaERP.DAL.Database.Migrations.Application
                         .HasConstraintName("fk_purchase_orders_users_user_id");
 
                     b.Navigation("Supplier");
-                });
-
-            modelBuilder.Entity("NexaERP.DAL.Entities.TaskComment", b =>
-                {
-                    b.HasOne("NexaERP.DAL.Entities.User", "Author")
-                        .WithMany()
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_task_comments_users_author_id");
-
-                    b.HasOne("NexaERP.DAL.Entities.ProjectTask", "Task")
-                        .WithMany()
-                        .HasForeignKey("TaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_task_comments_project_tasks_task_id");
-
-                    b.Navigation("Author");
-
-                    b.Navigation("Task");
                 });
 
             modelBuilder.Entity("NexaERP.DAL.Entities.Department", b =>
