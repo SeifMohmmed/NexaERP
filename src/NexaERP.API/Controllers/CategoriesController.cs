@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using NexaERP.BLL.DTOs.Category;
 using NexaERP.BLL.Mappings;
-using NexaERP.DAL.Authorization;
 using NexaERP.DAL.Caching;
 using NexaERP.DAL.Extensions;
 using NexaERP.DAL.Repositories.Abstraction;
@@ -21,7 +20,7 @@ public class CategoriesController(
     : ControllerBase
 {
     [HttpGet]
-    [HasPermission(Permissions.CategoriesRead)]
+    //[HasPermission(Permissions.CategoriesRead)]
     public async Task<ActionResult<List<CategoryDto>>> GetCategories()
     {
         const string cacheKey = "categories:all";

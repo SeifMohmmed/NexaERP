@@ -88,7 +88,6 @@ internal class GenericRepository<T> : IGenericRepository<T>
     public async Task<T?> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
         return await _dbSet
-            .AsNoTracking()
             .FirstOrDefaultAsync(e => e.Id == id, ct);
     }
 

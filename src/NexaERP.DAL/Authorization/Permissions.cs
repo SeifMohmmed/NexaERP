@@ -52,7 +52,21 @@ public static class Permissions
     public const string EmployeesCreate = "employees:create";
     public const string EmployeesUpdate = "employees:update";
     public const string EmployeesDelete = "employees:delete";
+    
+    // Projects
+    public const string ProjectsRead = "projects:read";
+    public const string ProjectsCreate = "projects:create";
+    public const string ProjectsUpdate = "projects:update";
+    public const string ProjectsUpdateStatus = "projects:update-status";
+    public const string ProjectsDelete = "projects:delete";
 
+    // Tasks
+    public const string TasksRead = "tasks:read";
+    public const string TasksCreate = "tasks:create";
+    public const string TasksUpdate = "tasks:update";
+    public const string TasksUpdateStatus = "tasks:update-status";
+    public const string TasksDelete = "tasks:delete";  
+    
     // Orders
     public const string OrdersRead = "orders:read";
     public const string OrdersCreate = "orders:create";
