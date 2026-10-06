@@ -29,7 +29,10 @@ public sealed class ApplicationDbContext(
     public DbSet<Department> Departments { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<AuditLog> AuditLogs { get; set; }
-
+    
+    public DbSet<Project> Projects { get; set; }
+    public DbSet<ProjectTask> ProjectTasks { get; set; }
+    public DbSet<TaskComment> TaskComments { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Set the default database schema.
@@ -44,6 +47,9 @@ public sealed class ApplicationDbContext(
         modelBuilder.ApplyConfiguration(new PurchaseLineConfiguration());
         modelBuilder.ApplyConfiguration(new OrderConfiguration());
         modelBuilder.ApplyConfiguration(new OrderLineConfiguration());
+        modelBuilder.ApplyConfiguration(new ProjectConfiguration());
+        modelBuilder.ApplyConfiguration(new ProjectTaskConfiguration());
+        modelBuilder.ApplyConfiguration(new TaskCommentConfiguration());
         modelBuilder.ApplyConfiguration(new InvoiceConfiguration());
         modelBuilder.ApplyConfiguration(new InvoiceLineConfiguration());
         modelBuilder.ApplyConfiguration(new AuditLogConfiguration());

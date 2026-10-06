@@ -7,6 +7,7 @@ using NexaERP.BLL.DTOs.Common;
 using NexaERP.BLL.DTOs.Customer;
 using NexaERP.BLL.Mappings;
 using NexaERP.DAL.Authorization;
+using NexaERP.DAL.Entities;
 using NexaERP.DAL.Extensions;
 using NexaERP.DAL.Repositories.Abstraction;
 namespace NexaERP.API.Controllers;
@@ -56,14 +57,14 @@ public class CustomersController(
         Guid id,
         [FromQuery] CustomerQueryParameters query)
     {
-        var customer = await customerRepository.GetByIdAsync(id);
+        Customer? customer = await customerRepository.GetByIdAsync(id);
 
         if (customer is null)
         {
             return NotFound();
         }
 
-        var dto = customer.ToDto();
+        CustomerDto dto = customer.ToDto();
 
         if (query.IncludeLinks)
         {
@@ -82,12 +83,12 @@ public class CustomersController(
     {
         await validator.ValidateAndThrowAsync(dto);
 
-        var customer = dto.ToEntity();
+        Customer customer = dto.ToEntity();
 
         await customerRepository.AddAsync(customer);
         await unitOfWork.SaveChangesAsync();
 
-        var customerDto = customer.ToDto();
+        CustomerDto customerDto = customer.ToDto();
         customerDto.Links = CreateLinksForCustomer(customerDto.Id);
 
         return CreatedAtAction(
@@ -105,7 +106,7 @@ public class CustomersController(
     {
         await validator.ValidateAndThrowAsync(dto);
 
-        var customer = await customerRepository.GetByIdAsync(id);
+        Customer? customer = await customerRepository.GetByIdAsync(id);
 
         if (customer is null)
         {
@@ -125,7 +126,7 @@ public class CustomersController(
     [HasPermission(Permissions.CustomersDelete)]
     public async Task<ActionResult> Delete(Guid id)
     {
-        var customer = await customerRepository.GetByIdAsync(id);
+        Customer? customer = await customerRepository.GetByIdAsync(id);
 
         if (customer is null)
         {

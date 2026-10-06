@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using NexaERP.BLL.DTOs.Auth;
 using NexaERP.BLL.Services.Abstraction;
 using NexaERP.DAL.Extensions;
+using NexaERP.DAL.Services;
 
 namespace NexaERP.API.Controllers;
 
@@ -92,7 +93,7 @@ public sealed class AuthController(
 
     [HttpPost("logout")]
     [Authorize]
-    [EnableRateLimiting(RateLimitingPolicies.Auth)]
+    //[EnableRateLimiting(RateLimitingPolicies.Auth)]
     public async Task<IActionResult> Logout(
     [FromBody] RefreshTokenDto dto)
     {
@@ -111,5 +112,24 @@ public sealed class AuthController(
         }
 
         return NoContent();
+    }
+
+    [Authorize]
+    [HttpGet("permissions")]
+    public async Task<ActionResult<HashSet<string>>> GetPermissions(
+    [FromServices] AuthorizationService authorizationService)
+    {
+        string? identityId = User.GetIdentityId();
+
+        if (identityId is null)
+        {
+            return Unauthorized();
+        }
+
+        HashSet<string> permissions =
+            await authorizationService.GetPermissionsForUserAsync(
+                identityId);
+
+        return Ok(permissions);
     }
 }
