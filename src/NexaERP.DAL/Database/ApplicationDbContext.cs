@@ -33,6 +33,7 @@ public sealed class ApplicationDbContext(
     public DbSet<Project> Projects { get; set; }
     public DbSet<ProjectTask> ProjectTasks { get; set; }
     public DbSet<TaskComment> TaskComments { get; set; }
+    public DbSet<BackgroundJob> BackgroundJobs { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Set the default database schema.

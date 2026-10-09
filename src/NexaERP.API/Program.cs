@@ -1,3 +1,4 @@
+using Hangfire;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using NexaERP.API;

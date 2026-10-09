@@ -87,4 +87,7 @@ public static class Permissions
     public const string InvoicesDelete = "invoices:delete";
     public const string InvoicesPay = "invoices:pay";
     public const string InvoicesDownloadPdf = "invoices:download-pdf";
+    
+    // Reports
+    public const string ReportsRead = "reports:read";
 }

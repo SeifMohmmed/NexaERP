@@ -1,10 +1,13 @@
 ﻿using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using FluentValidation;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.OpenApi;
+using NexaERP.API.BackgroundJobs;
 using NexaERP.API.Middleware;
 using NexaERP.API.Services;
 using NexaERP.API.Settings;
@@ -92,17 +95,34 @@ public static class DependencyInjection
         builder.Services.AddTransient<LinkService>();
         builder.Services.AddTransient<InvoicePdfService>();
         builder.Services.AddTransient<TokenProvider>();
+        builder.Services.AddScoped<ReportExportJob>();
 
         // Register business services.
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<IRoleService, RoleService>();
-
+            
         // Configure Swagger.
         AddSwaggerDocumentation(builder.Services);
-
+        
         //Configure CORS policy.
         AddCorsPolicy(builder.Services, builder.Configuration);
 
+        builder.Services.Configure<CurrencyOptions>(
+            builder.Configuration.GetSection("Currency"));
+        
+        builder.Services.AddHangfire(config => config
+            .UseRecommendedSerializerSettings()
+            .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+            .UseSimpleAssemblyNameTypeSerializer()
+            .UsePostgreSqlStorage(options =>
+                options.UseNpgsqlConnection(
+                    builder.Configuration.GetConnectionString("HangfireConnection")
+                )
+            )
+        );
+        
+        builder.Services.AddHangfireServer();
+        
         // Configure OpenTelemetry.
         builder.AddObservability();
 
