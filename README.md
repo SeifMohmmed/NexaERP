@@ -45,6 +45,8 @@ The project focuses on building a secure, maintainable, and scalable Web API usi
 - **Redis** – Distributed caching for authorization and read operations.
 - **FluentValidation** – Request validation.
 - **Swagger / OpenAPI** – Interactive API documentation and testing.
+- **Hangfire** – Background job processing for asynchronous report exports.
+- **CSV Export** – Exporting reports as downloadable CSV files
 - **Docker** – Containerization and infrastructure support.
 - **.NET Aspire Dashboard** – Application observability and monitoring.
 - **GitHub Actions** – CI/CD automation.
@@ -76,6 +78,21 @@ The project focuses on building a secure, maintainable, and scalable Web API usi
 - Department management.
 - User management.
 
+#### 📊 Analytics & Reports
+
+- Sales reports with date filtering and grouping by day, week, or month.
+- Inventory reports with category filtering and low-stock identification.
+- Invoice reports with date-range and status filtering.
+- Task progress reports grouped by project, assignee, and status.
+- Reports computed from existing business records.
+- Asynchronous report exports using Hangfire background jobs.
+- CSV report generation and download.
+- Background job status tracking.
+- Export file expiration after 24 hours.
+- Secure export downloads restricted to the requesting user or an Admin.
+- Authorization protection for report endpoints.
+- Filtering and aggregation for business reporting.
+
 #### 🔐 Security
 
 - ASP.NET Core Identity integration.
@@ -96,6 +113,7 @@ The project focuses on building a secure, maintainable, and scalable Web API usi
 - Optimistic concurrency using row versioning.
 - Automatic audit logging.
 - Infrastructure health checks.
+- Background job processing for long-running report exports.
 
 #### 🗄️ Data Access & Infrastructure
 
@@ -260,7 +278,10 @@ The project implements reusable backend patterns and cross-cutting concerns:
 - Optimistic Concurrency
 - Audit Logging
 - PostgreSQL + EF Core
-- Aspire Dashboard
+- Asynchronous CSV Report Exports
+- Analytics & Reporting
+- Secure Export Downloads
+- .NET Aspire Dashboard
 
 ## 📌 Project Modules
 
@@ -275,6 +296,8 @@ Invoices
 Employees
 Departments
 Users
+Analytics & Reports
+Background Jobs & Report Exports
 Authentication & Authorization
 ```
 
@@ -291,4 +314,6 @@ Concurrency
 Rate Limiting
 Health Checks
 Observability
+Background Processing
+File Export & Expiration
 ```
