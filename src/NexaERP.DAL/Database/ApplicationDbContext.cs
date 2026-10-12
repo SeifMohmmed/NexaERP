@@ -34,6 +34,10 @@ public sealed class ApplicationDbContext(
     public DbSet<ProjectTask> ProjectTasks { get; set; }
     public DbSet<TaskComment> TaskComments { get; set; }
     public DbSet<BackgroundJob> BackgroundJobs { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
+    public DbSet<NotificationSettings> NotificationSettings { get; set; }
+    public DbSet<AutomationRun> AutomationRuns { get; set; }
+    public DbSet<AutomationRule> AutomationRules { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Set the default database schema.
@@ -49,6 +53,11 @@ public sealed class ApplicationDbContext(
         modelBuilder.ApplyConfiguration(new OrderConfiguration());
         modelBuilder.ApplyConfiguration(new OrderLineConfiguration());
         modelBuilder.ApplyConfiguration(new ProjectConfiguration());
+        modelBuilder.ApplyConfiguration(new NotificationConfiguration());
+        modelBuilder.ApplyConfiguration(new NotificationSettingsConfiguration());
+        modelBuilder.ApplyConfiguration(new BackgroundJobConfiguration());
+        modelBuilder.ApplyConfiguration(new AutomationRunConfiguration());
+        modelBuilder.ApplyConfiguration(new AutomationRuleConfiguration());
         modelBuilder.ApplyConfiguration(new ProjectTaskConfiguration());
         modelBuilder.ApplyConfiguration(new TaskCommentConfiguration());
         modelBuilder.ApplyConfiguration(new InvoiceConfiguration());

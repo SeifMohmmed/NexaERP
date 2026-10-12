@@ -71,6 +71,121 @@ namespace NexaERP.DAL.Database.Migrations.Application
                     b.ToTable("AuditLogs", "nexa_erp");
                 });
 
+            modelBuilder.Entity("NexaERP.DAL.Entities.AutomationRule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("action");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasMaxLength(500)
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<bool>("Enabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("enabled");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Trigger")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("trigger");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_automation_rules");
+
+                    b.HasIndex("Enabled")
+                        .HasDatabaseName("ix_automation_rules_enabled");
+
+                    b.HasIndex("Trigger")
+                        .HasDatabaseName("ix_automation_rules_trigger");
+
+                    b.ToTable("AutomationRules", "nexa_erp");
+                });
+
+            modelBuilder.Entity("NexaERP.DAL.Entities.AutomationRun", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("completed_at");
+
+                    b.Property<string>("ErrorSummary")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("error_summary");
+
+                    b.Property<string>("EventId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("event_id");
+
+                    b.Property<Guid>("RuleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("rule_id");
+
+                    b.Property<DateTime>("StartedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("started_at");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasDefaultValue("Queued")
+                        .HasColumnName("status");
+
+                    b.Property<string>("Trigger")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("trigger");
+
+                    b.HasKey("Id")
+                        .HasName("pk_automation_runs");
+
+                    b.HasIndex("EventId")
+                        .HasDatabaseName("ix_automation_runs_event_id");
+
+                    b.HasIndex("RuleId", "EventId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_automation_runs_rule_id_event_id");
+
+                    b.HasIndex("RuleId", "Status")
+                        .HasDatabaseName("ix_automation_runs_rule_id_status");
+
+                    b.ToTable("AutomationRuns", "nexa_erp");
+                });
+
             modelBuilder.Entity("NexaERP.DAL.Entities.BackgroundJob", b =>
                 {
                     b.Property<Guid>("Id")
@@ -91,36 +206,47 @@ namespace NexaERP.DAL.Database.Migrations.Application
                         .HasColumnName("expires_at");
 
                     b.Property<string>("HangfireJobId")
-                        .HasColumnType("text")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("hangfire_job_id");
 
                     b.Property<string>("Parameters")
-                        .HasColumnType("text")
+                        .HasColumnType("jsonb")
                         .HasColumnName("parameters");
 
                     b.Property<string>("RequestedBy")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)")
                         .HasColumnName("requested_by");
 
                     b.Property<string>("ResultLocation")
-                        .HasColumnType("text")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
                         .HasColumnName("result_location");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
                         .HasColumnName("status");
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("type");
 
                     b.HasKey("Id")
                         .HasName("pk_background_jobs");
 
-                    b.ToTable("background_jobs", "nexa_erp");
+                    b.HasIndex("Status")
+                        .HasDatabaseName("ix_background_jobs_status");
+
+                    b.HasIndex("RequestedBy", "CreatedAt")
+                        .HasDatabaseName("ix_background_jobs_requested_by_created_at");
+
+                    b.ToTable("BackgroundJobs", "nexa_erp");
                 });
 
             modelBuilder.Entity("NexaERP.DAL.Entities.Category", b =>
@@ -457,6 +583,91 @@ namespace NexaERP.DAL.Database.Migrations.Application
                         .HasDatabaseName("ix_invoice_lines_invoice_id");
 
                     b.ToTable("InvoiceLines", "nexa_erp");
+                });
+
+            modelBuilder.Entity("NexaERP.DAL.Entities.Notification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("body");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("DeliveryStatus")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("delivery_status");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("read_at");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("title");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("type");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_notifications");
+
+                    b.HasIndex("UserId", "CreatedAt")
+                        .HasDatabaseName("ix_notifications_user_id_created_at");
+
+                    b.HasIndex("UserId", "ReadAt")
+                        .HasDatabaseName("ix_notifications_user_id_read_at");
+
+                    b.ToTable("Notifications", "nexa_erp");
+                });
+
+            modelBuilder.Entity("NexaERP.DAL.Entities.NotificationSettings", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.Property<string>("Channel")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("channel");
+
+                    b.Property<string>("EventType")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("event_type");
+
+                    b.Property<bool>("Enabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("enabled");
+
+                    b.HasKey("UserId", "Channel", "EventType")
+                        .HasName("pk_notification_settings");
+
+                    b.HasIndex("UserId", "Channel", "Enabled")
+                        .HasDatabaseName("ix_notification_settings_user_id_channel_enabled");
+
+                    b.ToTable("NotificationSettings", "nexa_erp");
                 });
 
             modelBuilder.Entity("NexaERP.DAL.Entities.Order", b =>
@@ -1001,6 +1212,18 @@ namespace NexaERP.DAL.Database.Migrations.Application
                     b.ToTable("Users", "nexa_erp");
                 });
 
+            modelBuilder.Entity("NexaERP.DAL.Entities.AutomationRun", b =>
+                {
+                    b.HasOne("NexaERP.DAL.Entities.AutomationRule", "Rule")
+                        .WithMany("Runs")
+                        .HasForeignKey("RuleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_automation_runs_automation_rules_rule_id");
+
+                    b.Navigation("Rule");
+                });
+
             modelBuilder.Entity("NexaERP.DAL.Entities.Employee", b =>
                 {
                     b.HasOne("NexaERP.DAL.Entities.Department", "Department")
@@ -1043,6 +1266,30 @@ namespace NexaERP.DAL.Database.Migrations.Application
                         .HasConstraintName("fk_invoice_lines_invoices_invoice_id");
 
                     b.Navigation("Invoice");
+                });
+
+            modelBuilder.Entity("NexaERP.DAL.Entities.Notification", b =>
+                {
+                    b.HasOne("NexaERP.DAL.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_notifications_users_user_id");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("NexaERP.DAL.Entities.NotificationSettings", b =>
+                {
+                    b.HasOne("NexaERP.DAL.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_notification_settings_users_user_id");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("NexaERP.DAL.Entities.Order", b =>
@@ -1189,6 +1436,11 @@ namespace NexaERP.DAL.Database.Migrations.Application
                     b.Navigation("Author");
 
                     b.Navigation("Task");
+                });
+
+            modelBuilder.Entity("NexaERP.DAL.Entities.AutomationRule", b =>
+                {
+                    b.Navigation("Runs");
                 });
 
             modelBuilder.Entity("NexaERP.DAL.Entities.Department", b =>
