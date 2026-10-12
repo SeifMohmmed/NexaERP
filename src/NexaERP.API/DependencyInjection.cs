@@ -100,7 +100,14 @@ public static class DependencyInjection
         // Register business services.
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<IRoleService, RoleService>();
-            
+        builder.Services.AddScoped<IAutomationService, AutomationService>();
+        builder.Services.AddScoped<INotificationService, NotificationService>();
+        builder.Services.AddScoped<IIdentityRecipientService, IdentityRecipientService>();    
+        builder.Services.AddScoped<IAutomationActionExecutor, AutomationActionExecutor>();    
+        builder.Services.AddScoped<IAutomationEventProcessor, AutomationEventProcessor>();    
+        
+        builder.Services.AddScoped<AutomationEventJob>();
+        
         // Configure Swagger.
         AddSwaggerDocumentation(builder.Services);
         
