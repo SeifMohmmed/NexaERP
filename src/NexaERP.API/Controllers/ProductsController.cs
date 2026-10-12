@@ -1,7 +1,9 @@
 ﻿using FluentValidation;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using NexaERP.API.BackgroundJobs;
 using NexaERP.API.Services;
 using NexaERP.BLL.DTOs.Common;
 using NexaERP.BLL.DTOs.Product;
@@ -20,7 +22,8 @@ namespace NexaERP.API.Controllers;
 public class ProductsController(
     IProductRepository productRepository,
     IUnitOfWork unitOfWork,
-    LinkService linkService) : ControllerBase
+    LinkService linkService,
+    IBackgroundJobClient backgroundJobClient) : ControllerBase
 {
     [HttpGet]
     [HasPermission(Permissions.ProductsRead)]
@@ -124,13 +127,13 @@ public class ProductsController(
 
         return NoContent();
     }
-
+    
     [HttpPatch("{id:guid}/stock")]
     [HasPermission(Permissions.ProductsAdjustStock)]
     public async Task<ActionResult> AdjustStock(
-    Guid id,
-    [FromBody] AdjustStockDto dto,
-    [FromServices] IValidator<AdjustStockDto> validator)
+        Guid id,
+        [FromBody] AdjustStockDto dto,
+        [FromServices] IValidator<AdjustStockDto> validator)
     {
         await validator.ValidateAndThrowAsync(dto);
 
@@ -141,11 +144,40 @@ public class ProductsController(
             return NotFound();
         }
 
+        int previousStock = product.StockQuantity;
+
         product.AdjustStock(dto.QuantityChange);
 
         productRepository.Update(product);
 
         await unitOfWork.SaveChangesAsync();
+
+        bool crossedReorderLevel =
+            previousStock > product.ReorderLevel &&
+            product.StockQuantity <= product.ReorderLevel;
+
+        if (crossedReorderLevel)
+        {
+            var eventId = Guid.CreateVersion7();
+
+            try
+            {
+                backgroundJobClient.Enqueue<AutomationEventJob>(
+                    job => job.ExecuteAsync(
+                        eventId,
+                        "InventoryBelowReorderLevel",
+                        "Low Stock Alert",
+                        $"Product '{product.Name}' (SKU: {product.SKU}) " +
+                        $"has reached its reorder level. " +
+                        $"Current stock: {product.StockQuantity}, " +
+                        $"reorder level: {product.ReorderLevel}."));
+            }
+            catch (Exception)
+            {
+                // The stock update has already been saved.
+                // Do not fail the business operation because job enqueueing failed.
+            }
+        }
 
         return NoContent();
     }
