@@ -78,6 +78,30 @@ The project focuses on building a secure, maintainable, and scalable Web API usi
 - Department management.
 - User management.
 
+#### ⚙️ Workflow Automation
+
+- Configurable automation rules for business workflows.
+- Support for `InventoryBelowReorderLevel` and `InvoiceOverdue` triggers.
+- Automated actions to notify a specific user or users belonging to a role.
+- Enable and disable automation rules.
+- Automation execution history with run status tracking.
+- Execution details including the associated rule, event, trigger, start time, completion time, and error summary.
+- Filter automation runs by rule ID, status, and date range.
+- Retrieve individual automation runs by ID.
+- Combined filtering for automation execution history.
+- Role-based authorization for automation rule management and execution history endpoints.
+
+#### 🔔 Notifications
+
+- In-app notifications for business events.
+- Notifications triggered by workflow automation rules.
+- Notification preferences management.
+- Retrieve notifications and unread notification counts.
+- Mark individual notifications as read.
+- Mark multiple notifications as read.
+- User ownership enforcement for notification operations.
+- Notification delivery controlled by user preferences.
+
 #### 📊 Analytics & Reports
 
 - Sales reports with date filtering and grouping by day, week, or month.
@@ -105,7 +129,10 @@ The project focuses on building a secure, maintainable, and scalable Web API usi
 - Role-based authorization.
 - Permission-based authorization policies.
 - User ownership enforcement for orders.
-
+- Role-based authorization for workflow automation management.
+- Authorization protection for automation execution history.
+- User ownership enforcement for notification access and updates.
+  
 #### ⚡ Performance & Reliability
 
 - Redis caching for authorization and read operations.
@@ -114,6 +141,10 @@ The project focuses on building a secure, maintainable, and scalable Web API usi
 - Automatic audit logging.
 - Infrastructure health checks.
 - Background job processing for long-running report exports.
+- Asynchronous workflow automation execution.
+- Automation execution tracking with `Queued`, `Processing`, `Completed`, and `Failed` statuses.
+- Automation run history for monitoring workflow outcomes.
+- Notification delivery retry handling, separate from automation execution.
 
 #### 🗄️ Data Access & Infrastructure
 
@@ -282,6 +313,12 @@ The project implements reusable backend patterns and cross-cutting concerns:
 - Analytics & Reporting
 - Secure Export Downloads
 - .NET Aspire Dashboard
+- Workflow Automation
+- Configurable Automation Rules
+- Automation Execution History
+- In-App Notifications
+- Notification Preferences
+- Asynchronous Automation Processing
 
 ## 📌 Project Modules
 
@@ -299,6 +336,9 @@ Users
 Analytics & Reports
 Background Jobs & Report Exports
 Authentication & Authorization
+Workflow Automation
+Automation Rules & Execution History
+Notifications & Notification Preferences
 ```
 
 ### Cross-Cutting Infrastructure
@@ -316,4 +356,8 @@ Health Checks
 Observability
 Background Processing
 File Export & Expiration
+Workflow Automation
+Automation Execution Tracking
+In-App Notifications
+Notification Preferences
 ```
